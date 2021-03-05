@@ -18,6 +18,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-
-
     }
 
     @Override
@@ -89,11 +88,29 @@ public class MainActivity extends AppCompatActivity {
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential).addOnCompleteListener(task -> {
-            if (task.isSuccessful())
+            if (task.isSuccessful()) {
                 Log.d(TAG, "SignInWithCredential: success");
+                Intent principalActivity = new Intent(this, PrincipalActivity.class);
+                startActivity(principalActivity);
+                this.finish();
+            }
             else
                 Log.w(TAG, "SignInWithCredential: fail", task.getException());
 
         });
+    }
+
+    /**
+     * Method to verify if the user is logged in
+     * If it is, we prevent you from logging in again
+     */
+    @Override
+    protected void onStart() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            Intent principalActivity = new Intent(this, PrincipalActivity.class);
+            startActivity(principalActivity);
+        }
+        super.onStart();
     }
 }
