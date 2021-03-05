@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Kotta</string>
+    <string name="SignIn">Inicia sesión con Google</string>
 </resources>

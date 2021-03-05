@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "721660928398",
+    "project_id": "kotta-a14a4",
+    "storage_bucket": "kotta-a14a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721660928398:android:fdd1df08554248b113c4df",
+        "android_client_info": {
+          "package_name": "net.lidia.iessochoa.kotta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "721660928398-hot5k3thojb3bgri4598rrbjjr2ba0le.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK6XO7f3INsIkVe1aY0kf7UlIaJBsiDXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "721660928398-hot5k3thojb3bgri4598rrbjjr2ba0le.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
