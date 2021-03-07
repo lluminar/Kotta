@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Kotta</string>
-    <string name="SignIn">Inicia sesión con Google</string>
     <string name="title_activity_principal">Inicio</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -11,4 +10,10 @@
 
     <string name="menu_home">Inicio</string>
     <string name="menu_perfil">Perfil</string>
+
+    <string name="user">Usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="SignIn">Iniciar sesión</string>
+    <string name="SignInGoogle">Inicia sesión con Google</string>
+
 </resources>

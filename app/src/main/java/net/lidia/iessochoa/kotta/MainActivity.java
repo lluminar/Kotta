@@ -7,8 +7,10 @@ import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private Button btnSignInGoogle;
+    private Button btnSignIn;
+    private EditText etEmail;
+    private EditText etPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +41,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnSignInGoogle = findViewById(R.id.btnSignInGoogle);
+        btnSignIn = findViewById(R.id.btnSignIn);
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
 
         btnSignInGoogle.setOnClickListener(view -> {
             signInGoogle();
+        });
+
+        btnSignIn.setOnClickListener(v -> {
+            signIn();
         });
 
         //Configure Google Sign In
@@ -79,6 +91,23 @@ public class MainActivity extends AppCompatActivity {
     private void signInGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void signIn() {
+        if (mAuth.getCurrentUser() != null) {
+            finish();// Cerramos la actividad.
+            //Abrimos la actividad que contiene el inicio de la funcionalidad de la app.
+            startActivity(new Intent(this, PrincipalActivity.class));
+        } else {
+            //Si no está autenticado, llamamos al proceso de autenticación de FireBase
+            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
+                    // Si quisieramos varios proveedores de autenticación. Mirar la documentación oficial, ya que cambia de una versión a otra
+                    // .setAvalaibleProviders(AuthUI.EMAIL_PROVIDER,AuthUI.GOOGLE_PROVIDER)
+                    // icono que mostrará, a mi no me funciona
+                    .setLogo(R.drawable.ic_launcher_background)
+                    .setIsSmartLockEnabled(false)//para guardar contraseñas y usuario: true
+                    .build(), RC_SIGN_IN);
+        }
     }
 
     /**
