@@ -15,5 +15,7 @@
     <color name="primaryTextColor">#000000</color>
     <color name="textColorPrimary">#00363a</color>
     <color name="loginPageBackgroundColor">#fff</color>
+    <color name="back">#FFFFFF</color>
+
     
 </resources>

@@ -15,5 +15,7 @@
     <string name="password">Contraseña</string>
     <string name="SignIn">Iniciar sesión</string>
     <string name="SignInGoogle">Inicia sesión con Google</string>
+    <string name="search">Buscar</string>
+    <string name="more">mas</string>
 
 </resources>
