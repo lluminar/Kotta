@@ -1,22 +1,28 @@
 package net.lidia.iessochoa.kotta.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.ui.AddActivity;
+import net.lidia.iessochoa.kotta.ui.PrincipalActivity;
 
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
+    private BottomAppBar bottomAppBar;
+    private FloatingActionButton fabAdd;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -29,6 +35,22 @@ public class HomeFragment extends Fragment {
                 textView.setText(s);
             }
         });*/
+        bottomAppBar = root.findViewById(R.id.bottomAppBar);
+        fabAdd = root.findViewById(R.id.fabAdd);
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        //Handle navigation icon press
+        bottomAppBar.setNavigationOnClickListener(v -> {
+
+        });
+
+        fabAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AddActivity.class);
+            startActivity(intent);
+        });
     }
 }

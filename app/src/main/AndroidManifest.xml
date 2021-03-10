@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.lidia.iessochoa.kotta">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -11,10 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kotta">
         <activity
-            android:name=".PrincipalActivity"
+            android:name=".ui.AddActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.PrincipalActivity" />
+        </activity>
+        <activity
+            android:name=".ui.PrincipalActivity"
             android:label="@string/title_activity_principal"
-            android:theme="@style/Theme.Kotta.NoActionBar"></activity>
-        <activity android:name=".MainActivity">
+            android:theme="@style/Theme.Kotta.NoActionBar" />
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,5 +29,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

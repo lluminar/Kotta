@@ -1,4 +1,4 @@
-package net.lidia.iessochoa.kotta;
+package net.lidia.iessochoa.kotta.ui;
 
 import android.os.Bundle;
 import android.view.View;
@@ -16,10 +16,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import net.lidia.iessochoa.kotta.R;
+
 public class PrincipalActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

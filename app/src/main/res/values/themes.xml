@@ -49,6 +49,7 @@
     <style name="Theme.App" parent="Theme.Kotta">
         <item name="bottomAppBarStyle">@style/Widget.App.BottomAppBar</item>
         <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
+
     </style>
 
     <style name="Widget.App.BottomAppBar" parent="Widget.MaterialComponents.BottomAppBar.Colored">
@@ -74,6 +75,8 @@
         <item name="cornerFamily">cut</item>
         <item name="cornerSize">4dp</item>
     </style>
+
+    <!--Spinner-->
 
     <style name="Theme.Kotta.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

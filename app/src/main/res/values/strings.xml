@@ -16,6 +16,9 @@
     <string name="SignIn">Iniciar sesión</string>
     <string name="SignInGoogle">Inicia sesión con Google</string>
     <string name="search">Buscar</string>
-    <string name="more">mas</string>
+    <string name="nombre">Nombre</string>
+    <string name="instrument">Instrumento</string>
+    <string name="author">Autor</string>
+    <string name="category">Categoría</string>
 
 </resources>
