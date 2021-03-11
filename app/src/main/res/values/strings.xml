@@ -21,4 +21,12 @@
     <string name="author">Autor</string>
     <string name="category">Categoría</string>
 
+    <string-array name="category">
+        <item>Rock</item>
+        <item>Pop</item>
+        <item>Clásica</item>
+        <item>Videojuegos</item>
+        <item>Películas</item>
+        <item>Baladas</item>
+    </string-array>
 </resources>

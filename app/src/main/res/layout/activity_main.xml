@@ -95,5 +95,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/audio_wave1600c" />
+        app:srcCompat="@mipmap/audio_wave1600c" />
 </androidx.constraintlayout.widget.ConstraintLayout>
