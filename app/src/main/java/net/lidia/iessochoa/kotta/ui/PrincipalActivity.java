@@ -3,10 +3,13 @@ package net.lidia.iessochoa.kotta.ui;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -21,10 +24,17 @@ import net.lidia.iessochoa.kotta.R;
 public class PrincipalActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+    private ImageView ivAuthorGoogle;
+    private TextView tvName;
+    private TextView tvEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -39,6 +49,18 @@ public class PrincipalActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        //Change name, email and profile picture
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        View headerView = navigationView.getHeaderView(0);
+        tvName = (TextView) headerView.findViewById(R.id.tvName);
+        tvEmail = (TextView) headerView.findViewById(R.id.tvEmail);
+        ivAuthorGoogle = (ImageView) headerView.findViewById(R.id.ivUser);
+        tvName.setText(currentUser.getDisplayName());
+        tvEmail.setText(currentUser.getEmail());
+        if (currentUser.getPhotoUrl() != null)
+            Glide.with(this).load(currentUser.getPhotoUrl()).into(ivAuthorGoogle);
     }
 
     @Override

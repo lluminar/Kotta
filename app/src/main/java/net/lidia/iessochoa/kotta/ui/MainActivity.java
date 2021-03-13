@@ -1,22 +1,28 @@
 package net.lidia.iessochoa.kotta.ui;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -30,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-    private Button btnSignInGoogle;
-    private Button btnSignIn;
-    private EditText etEmail;
-    private EditText etPassword;
+    private Button btnSignInGoogle, btnSignIn;
+    private EditText etEmail, etPassword;
+    private String emailHolder, passwordHolder;
+    private boolean editTextEmptyCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +56,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnSignIn.setOnClickListener(v -> {
-            signIn();
+            checkEditTextIsNotEmpty();
+            if (editTextEmptyCheck)
+                signIn();
+            else
+                Toast.makeText(this, "Please Fill All the Fields", Toast.LENGTH_LONG).show();
         });
 
         //Configure Google Sign In
@@ -88,26 +98,52 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void signInGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
     private void signIn() {
         if (mAuth.getCurrentUser() != null) {
             finish();// Cerramos la actividad.
             //Abrimos la actividad que contiene el inicio de la funcionalidad de la app.
             startActivity(new Intent(this, PrincipalActivity.class));
         } else {
+            mAuth.signInWithEmailAndPassword(emailHolder, passwordHolder)
+                    .addOnCompleteListener(this, task -> {
+                        // If task done Successful.
+                        if(task.isSuccessful()){
+                            // Closing the current Login Activity.
+                            finish();
+                            // Opening the UserProfileActivity.
+                            Intent intent = new Intent(this, PrincipalActivity.class);
+                            startActivity(intent);
+                        }
+                        else {
+                            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
+                                    // Si quisieramos varios proveedores de autenticación. Mirar la documentación oficial, ya que cambia de una versión a otra
+                                    // .setAvalaibleProviders(AuthUI.EMAIL_PROVIDER,AuthUI.GOOGLE_PROVIDER)
+                                    // icono que mostrará, a mi no me funciona
+                                    .setIsSmartLockEnabled(false)//para guardar contraseñas y usuario: true
+                                    .build(), RC_SIGN_IN);
+                            // Showing toast message when email or password not found in Firebase Online database.
+                            Toast.makeText(this, "Email or Password Not found, Please create an account", Toast.LENGTH_LONG).show();
+                        }
+                    });
             //Si no está autenticado, llamamos al proceso de autenticación de FireBase
-            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
-                    // Si quisieramos varios proveedores de autenticación. Mirar la documentación oficial, ya que cambia de una versión a otra
-                    // .setAvalaibleProviders(AuthUI.EMAIL_PROVIDER,AuthUI.GOOGLE_PROVIDER)
-                    // icono que mostrará, a mi no me funciona
-                    .setLogo(R.drawable.ic_launcher_background)
-                    .setIsSmartLockEnabled(false)//para guardar contraseñas y usuario: true
-                    .build(), RC_SIGN_IN);
+            /**/
         }
+    }
+
+    private void checkEditTextIsNotEmpty() {
+        // Getting value form Email's EditText and fill into EmailHolder string variable.
+        emailHolder = etEmail.getText().toString().trim();
+
+        // Getting value form Password's EditText and fill into PasswordHolder string variable.
+        passwordHolder = etPassword.getText().toString().trim();
+
+        // Checking Both EditText is empty or not.
+        if(TextUtils.isEmpty(emailHolder) || TextUtils.isEmpty(passwordHolder))
+            // If any of EditText is empty then set value as false.
+            editTextEmptyCheck = false;
+        else
+            // If any of EditText is empty then set value as true.
+            editTextEmptyCheck = true ;
     }
 
     /**
@@ -127,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "SignInWithCredential: fail", task.getException());
 
         });
+    }
+
+    private void signInGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     /**
