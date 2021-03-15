@@ -1,9 +1,7 @@
 package net.lidia.iessochoa.kotta.ui;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,16 +11,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -36,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-    private Button btnSignInGoogle, btnSignIn;
+    private Button btnSignInGoogle, btnSignIn, btnCreateAccount;
     private EditText etEmail, etPassword;
     private String emailHolder, passwordHolder;
     private boolean editTextEmptyCheck;
@@ -48,19 +43,35 @@ public class MainActivity extends AppCompatActivity {
 
         btnSignInGoogle = findViewById(R.id.btnSignInGoogle);
         btnSignIn = findViewById(R.id.btnSignIn);
+        btnCreateAccount = findViewById(R.id.btnCreateAccount);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
 
+        /**
+         * A button to sign in with google account
+         */
         btnSignInGoogle.setOnClickListener(view -> {
             signInGoogle();
         });
 
+        /**
+         * Sign in with editText
+         */
         btnSignIn.setOnClickListener(v -> {
             checkEditTextIsNotEmpty();
             if (editTextEmptyCheck)
                 signIn();
             else
                 Toast.makeText(this, "Please Fill All the Fields", Toast.LENGTH_LONG).show();
+        });
+
+        /**
+         * A button to create an account
+         */
+        btnCreateAccount.setOnClickListener(v -> {
+            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
+                    .setIsSmartLockEnabled(false)//para guardar contraseñas y usuario: true
+                    .build(), RC_SIGN_IN);
         });
 
         //Configure Google Sign In
@@ -115,18 +126,10 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                         else {
-                            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
-                                    // Si quisieramos varios proveedores de autenticación. Mirar la documentación oficial, ya que cambia de una versión a otra
-                                    // .setAvalaibleProviders(AuthUI.EMAIL_PROVIDER,AuthUI.GOOGLE_PROVIDER)
-                                    // icono que mostrará, a mi no me funciona
-                                    .setIsSmartLockEnabled(false)//para guardar contraseñas y usuario: true
-                                    .build(), RC_SIGN_IN);
-                            // Showing toast message when email or password not found in Firebase Online database.
-                            Toast.makeText(this, "Email or Password Not found, Please create an account", Toast.LENGTH_LONG).show();
+                            //If it is not authenticated, we indicate it by means of a error in editText
+                            etEmail.setError("Email or Password Not found, Please create an account");
                         }
                     });
-            //Si no está autenticado, llamamos al proceso de autenticación de FireBase
-            /**/
         }
     }
 
