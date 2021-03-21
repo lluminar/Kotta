@@ -18,10 +18,14 @@
     <string name="CreateAccount">Crear una cuenta</string>
     <string name="SignInGoogle">Inicia sesión con Google</string>
     <string name="search">Buscar</string>
+    <string name="check">Guardar</string>
     <string name="nombre">Nombre</string>
     <string name="instrument">Instrumento</string>
     <string name="author">Autor</string>
     <string name="category">Categoría</string>
+
+    <string name="Aviso">Aviso</string>
+    <string name="vacio">Es necesario rellenar todos los campos</string>
 
     <string-array name="category">
         <item>Rock</item>

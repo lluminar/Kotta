@@ -7,10 +7,13 @@ import android.provider.BaseColumns;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 @Entity(tableName = Partitura.TABLE_NAME,
@@ -38,26 +41,117 @@ public class Partitura implements Parcelable {
     @NonNull
     private String autor;
     @NonNull
-    private String Categoria;
+    private String categoria;
     @NonNull
     private String pdf;
 
+    @Ignore
+    public Partitura(int id, @NonNull Date fecha, @NonNull String nombre, @NonNull String instrumento,
+                     @NonNull String autor, @NonNull String categoria, @NonNull String pdf) {
+        this.id = id;
+        this.fecha = fecha;
+        this.nombre = nombre;
+        this.instrumento = instrumento;
+        this.autor = autor;
+        this.categoria = categoria;
+        this.pdf = pdf;
+    }
+
+    public Partitura(@NonNull Date fecha, @NonNull String nombre, @NonNull String instrumento,
+                     @NonNull String autor, @NonNull String categoria, @NonNull String pdf) {
+        this.fecha = fecha;
+        this.nombre = nombre;
+        this.instrumento = instrumento;
+        this.autor = autor;
+        this.categoria = categoria;
+        this.pdf = pdf;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @NonNull
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(@NonNull Date fecha) {
+        this.fecha = fecha;
+    }
+
+    @NonNull
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(@NonNull String nombre) {
+        this.nombre = nombre;
+    }
+
+    @NonNull
+    public String getInstrumento() {
+        return instrumento;
+    }
+
+    public void setInstrumento(@NonNull String instrumento) {
+        this.instrumento = instrumento;
+    }
+
+    @NonNull
+    public String getAutor() {
+        return autor;
+    }
+
+    public void setAutor(@NonNull String autor) {
+        this.autor = autor;
+    }
+
+    @NonNull
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(@NonNull String categoria) {
+        this.categoria = categoria;
+    }
+
+    @NonNull
+    public String getPdf() {
+        return pdf;
+    }
+
+    public void setPdf(@NonNull String pdf) {
+        this.pdf = pdf;
+    }
+
+    public String getFechaFormatoLocal() {
+        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
+        return df.format(fecha);
+    }
+
     protected Partitura(Parcel in) {
         id = in.readInt();
+        fecha = (Date) in.readSerializable();
         nombre = in.readString();
         instrumento = in.readString();
         autor = in.readString();
-        Categoria = in.readString();
+        categoria = in.readString();
         pdf = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
+        dest.writeSerializable(this.fecha);
         dest.writeString(nombre);
         dest.writeString(instrumento);
         dest.writeString(autor);
-        dest.writeString(Categoria);
+        dest.writeString(categoria);
         dest.writeString(pdf);
     }
 

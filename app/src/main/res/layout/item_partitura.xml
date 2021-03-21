@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cvItem"
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+    card_view:cardBackgroundColor="@color/back"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="4dp"
+    card_view:cardUseCompatPadding="true"
+    tools:ignore="MissingConstraints">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clItemPartitura"
+        android:layout_width="match_parent"
+        android:layout_height="174dp">
+
+        <TextView
+            android:id="@+id/tvNameCv"
+            android:layout_width="0dp"
+            android:layout_height="21dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="false"
+            android:text="TextView"
+            android:textSize="18sp"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0.0"
+            card_view:layout_constraintStart_toEndOf="@+id/ivCategoryCv"
+            card_view:layout_constraintTop_toTopOf="@+id/ivCategoryCv" />
+
+        <TextView
+            android:id="@+id/tvInstrumentCv"
+            android:layout_width="0dp"
+            android:layout_height="21dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="false"
+            android:text="TextView"
+            android:textSize="18sp"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0.0"
+            card_view:layout_constraintStart_toEndOf="@+id/ivCategoryCv"
+            card_view:layout_constraintTop_toBottomOf="@+id/tvNameCv" />
+
+        <TextView
+            android:id="@+id/tvAuthorCv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="TextView"
+            card_view:layout_constraintBottom_toBottomOf="@+id/ivCategoryCv"
+            card_view:layout_constraintStart_toEndOf="@+id/ivCategoryCv" />
+
+        <ImageView
+            android:id="@+id/ivCategoryCv"
+            android:layout_width="93dp"
+            android:layout_height="101dp"
+            android:layout_marginStart="8dp"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent"
+            card_view:srcCompat="@drawable/ic_add_pdf" />
+
+        <TextView
+            android:id="@+id/tvSizeCv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="TextView"
+            card_view:layout_constraintBottom_toBottomOf="@+id/tvAuthorCv"
+            card_view:layout_constraintStart_toEndOf="@+id/tvAuthorCv"
+            card_view:layout_constraintTop_toTopOf="@+id/tvAuthorCv" />
+
+        <ImageView
+            android:id="@+id/ivDownload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            card_view:layout_constraintBottom_toBottomOf="@+id/tvSizeCv"
+            card_view:layout_constraintEnd_toEndOf="@+id/tvInstrumentCv"
+            card_view:srcCompat="@drawable/ic_baseline_logout_24" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
