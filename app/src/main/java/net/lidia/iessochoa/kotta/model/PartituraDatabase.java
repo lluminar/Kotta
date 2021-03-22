@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Database(entities = {Partitura.class}, version = 2)
-
 @TypeConverters({TransformaFechaSQLite.class})
 public abstract class PartituraDatabase extends RoomDatabase {
 

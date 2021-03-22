@@ -15,6 +15,10 @@
 
         <!-- Scrollable content -->
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPartituras"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomappbar.BottomAppBar

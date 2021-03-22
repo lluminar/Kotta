@@ -15,7 +15,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-
 @Entity(tableName = Partitura.TABLE_NAME,
         indices = {@Index(value = {Partitura.FECHA},unique = true)})
 public class Partitura implements Parcelable {
@@ -33,16 +32,22 @@ public class Partitura implements Parcelable {
     @ColumnInfo(name=ID)
     private int id;
     @NonNull
+    @ColumnInfo(name = FECHA)
     private Date fecha;
     @NonNull
+    @ColumnInfo(name = NOMBRE)
     private String nombre;
     @NonNull
+    @ColumnInfo(name = INSTRUMENTO)
     private String instrumento;
     @NonNull
+    @ColumnInfo(name = AUTOR)
     private String autor;
     @NonNull
+    @ColumnInfo(name = CATEGORIA)
     private String categoria;
     @NonNull
+    @ColumnInfo(name = PDF)
     private String pdf;
 
     @Ignore
