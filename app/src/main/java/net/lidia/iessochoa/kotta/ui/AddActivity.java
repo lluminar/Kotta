@@ -17,7 +17,6 @@ import android.widget.ImageView;
 
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
-import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 import net.lidia.iessochoa.kotta.ui.home.HomeViewModel;
 
 public class AddActivity extends AppCompatActivity {
@@ -49,8 +48,8 @@ public class AddActivity extends AppCompatActivity {
 
         categorias = getResources().getStringArray(R.array.category);
 
-        partitura = getIntent().getExtras().getParcelable(EXTRA_PARTITURA);
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+       /* partitura = getIntent().getExtras().getParcelable(EXTRA_PARTITURA);
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);*/
 
         //Se crean los menús para los spinners
         ArrayAdapter<String> adaptador1;
@@ -94,13 +93,12 @@ public class AddActivity extends AppCompatActivity {
         startActivityForResult(intent, PICK_PDF_FILE);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
                 //Validación de datos
-                Intent intent = new Intent();
+                /*Intent intent = new Intent();
                 for (EditText campo : datos) {
                     if (campo.getText().length() < 1) {
                         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
@@ -118,7 +116,7 @@ public class AddActivity extends AppCompatActivity {
                         setResult(RESULT_OK, getIntent());
                         finish();
                     }
-                }
+                }*/
                 break;
             default:
                 return super.onOptionsItemSelected(item);

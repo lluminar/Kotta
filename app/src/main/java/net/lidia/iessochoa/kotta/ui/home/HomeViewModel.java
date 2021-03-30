@@ -26,16 +26,11 @@ public class HomeViewModel extends AndroidViewModel {
 
     public HomeViewModel(@NonNull Application application) {
         super(application);
-        mRepository= PartituraRepository.getInstance(application);
-        //Recuperamos el LiveData de todos los pokemons
-        mAllPartituras = mRepository.getAllPartituras();
+
     }
 
     public LiveData<List<Partitura>> getAllPartituras() {
         return mAllPartituras;
     }
 
-    public void insert(Partitura partitura){
-        mRepository.insert(partitura);
-    }
 }

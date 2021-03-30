@@ -38,7 +38,8 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
         if (partituraList != null) {
             final Partitura partitura = partituraList.get(position);
             holder.tvNameCv.setText(partitura.getNombre());
-
+            holder.tvInstrument.setText(partitura.getInstrumento());
+            holder.tvAuthor.setText(partitura.getAutor());
             //We assign the listener
             if (listener!=null)
                 holder.itemView.setOnClickListener(v -> listener.onItemClickElemento(partitura));
@@ -51,8 +52,7 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
      */
     @Override
     public int getItemCount() {
-        if (partituraList != null)
-            return partituraList.size();
+        if (partituraList != null) return partituraList.size();
         else return 0;
     }
 
@@ -75,6 +75,7 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
         private ImageView ivCategory;
         private TextView tvNameCv;
         private TextView tvInstrument;
+        private TextView tvAuthor;
         private ImageView ivDownload;
         private Partitura partitura;
         private CardView itemPartitura;
@@ -84,6 +85,7 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
             ivCategory = itemView.findViewById(R.id.ivCategoryCv);
             tvNameCv = itemView.findViewById(R.id.tvNameCv);
             tvInstrument = itemView.findViewById(R.id.tvInstrumentCv);
+            tvAuthor = itemView.findViewById(R.id.tvAuthorCv);
             ivDownload = itemView.findViewById(R.id.ivDownload);
             itemPartitura = itemView.findViewById(R.id.cvItem);
 
