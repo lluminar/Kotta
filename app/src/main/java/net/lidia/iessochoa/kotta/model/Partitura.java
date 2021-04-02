@@ -1,11 +1,14 @@
 package net.lidia.iessochoa.kotta.model;
 
+import com.google.firebase.firestore.ServerTimestamp;
+
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class Partitura {
-    private int id;
+    private String user;
+    @ServerTimestamp
     private Date fecha;
     private String nombre;
     private String instrumento;
@@ -13,10 +16,8 @@ public class Partitura {
     private String categoria;
     private String pdf;
 
-    public Partitura(int id, Date fecha, String nombre, String instrumento, String autor,
-                     String categoria, String pdf) {
-        this.id = id;
-        this.fecha = fecha;
+    public Partitura(String user, String nombre, String instrumento, String autor, String categoria, String pdf) {
+        this.user = user;
         this.nombre = nombre;
         this.instrumento = instrumento;
         this.autor = autor;
@@ -24,21 +25,12 @@ public class Partitura {
         this.pdf = pdf;
     }
 
-    public Partitura(Date fecha, String nombre, String instrumento, String autor, String categoria, String pdf) {
-        this.fecha = fecha;
-        this.nombre = nombre;
-        this.instrumento = instrumento;
-        this.autor = autor;
-        this.categoria = categoria;
-        this.pdf = pdf;
+    public String getUser() {
+        return user;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public Date getFecha() {
@@ -87,10 +79,5 @@ public class Partitura {
 
     public void setPdf(String pdf) {
         this.pdf = pdf;
-    }
-
-    public String getFechaFormatoLocal() {
-        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
-        return df.format(fecha);
     }
 }

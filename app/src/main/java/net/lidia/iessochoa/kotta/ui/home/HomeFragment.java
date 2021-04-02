@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
@@ -28,9 +29,11 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private PartituraAdapter adapter;
 
+    FirebaseFirestore firebaseFirestore;
+    private RecyclerView rvPartituras;
+
     private BottomAppBar bottomAppBar;
     private FloatingActionButton fabAdd;
-    private RecyclerView rvPartituras;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class HomeFragment extends Fragment {
         rvPartituras = root.findViewById(R.id.rvPartituras);
         bottomAppBar = root.findViewById(R.id.bottomAppBar);
         fabAdd = root.findViewById(R.id.fabAdd);
+        firebaseFirestore = FirebaseFirestore.getInstance();
         /*homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         adapter = new PartituraAdapter();
 
@@ -81,8 +85,6 @@ public class HomeFragment extends Fragment {
             // De lo contrario, recogemos el resultado de la segunda actividad.
             switch (requestCode) {
                 case OPTION_REQUEST_NUEVA:
-                    Partitura partitura = data.getExtras().getParcelable(AddActivity.EXTRA_PARTITURA_RESULT);
-                    //homeViewModel.insert(partitura);
                     break;
             }
         }

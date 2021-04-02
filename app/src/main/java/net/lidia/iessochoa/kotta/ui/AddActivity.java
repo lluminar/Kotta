@@ -1,38 +1,54 @@
 package net.lidia.iessochoa.kotta.ui;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
 import net.lidia.iessochoa.kotta.ui.home.HomeViewModel;
 
 public class AddActivity extends AppCompatActivity {
-    public static final String EXTRA_PARTITURA = "net.lidia.iessochoa.kotta.AddActivity";
-    public static final String EXTRA_PARTITURA_RESULT = "net.lidia.iessochoa.kotta.AddActivity";
     private final int PICK_PDF_FILE = 2;
+    private FirebaseAuth mAuth;
+    private StorageReference mStorageReference;
+    private DatabaseReference mDatabaseReference;
 
     private Partitura partitura;
-    private HomeViewModel homeViewModel;
 
     private EditText etName;
     private EditText etInstrument;
     private EditText etAuthor;
     private ImageView ivPDF;
     private AutoCompleteTextView actvCategoria;
+    private ProgressBar progressBar;
+    private TextView tvProgress;
     private String[] categorias;
+    Button button;
     private EditText[] datos;
 
     @Override
@@ -40,17 +56,20 @@ public class AddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
 
+        mStorageReference = FirebaseStorage.getInstance().getReference();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS);
+        mAuth = FirebaseAuth.getInstance();
+
         etName = findViewById(R.id.etName);
         etInstrument = findViewById(R.id.etInstrument);
         etAuthor = findViewById(R.id.etAuthor);
         actvCategoria = findViewById(R.id.fedCategoria);
         ivPDF = findViewById(R.id.ivPdf);
+        progressBar = findViewById(R.id.progressBar);
+        tvProgress = findViewById(R.id.tvProgress);
+        button = findViewById(R.id.button2);
 
         categorias = getResources().getStringArray(R.array.category);
-
-       /* partitura = getIntent().getExtras().getParcelable(EXTRA_PARTITURA);
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);*/
-
         //Se crean los menús para los spinners
         ArrayAdapter<String> adaptador1;
         AutoCompleteTextView actv;
@@ -59,8 +78,8 @@ public class AddActivity extends AppCompatActivity {
         actv.setAdapter(adaptador1);
 
         ivPDF.setOnClickListener(v -> {
-            String directorio = Environment.getExternalStorageDirectory().getPath();
-            openFile(Uri.parse(directorio));
+            //directorio = Environment.getExternalStorageDirectory().getPath();
+            getPDF();
         });
 
         datos = new EditText[]{
@@ -81,6 +100,17 @@ public class AddActivity extends AppCompatActivity {
         return true;
     }
 
+    private void getPDF() {
+        //for greater than lolipop versions we need the permissions asked on runtime
+        //so if the permission is not available user will go to the screen to allow storage permission
+
+        //creating an intent for file chooser
+        Intent intent = new Intent();
+        intent.setType("application/pdf");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select PDF"), PICK_PDF_FILE);
+    }
+
     private void openFile(Uri pickerInitialUri) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -93,12 +123,60 @@ public class AddActivity extends AppCompatActivity {
         startActivityForResult(intent, PICK_PDF_FILE);
     }
 
+    //this method is uploading the file
+    //the code is same as the previous tutorial
+    //so we are not explaining it
+    private void uploadFile(Uri data) {
+        progressBar.setVisibility(View.VISIBLE);
+        StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + System.currentTimeMillis() + ".pdf");
+        sRef.putFile(data)
+                .addOnSuccessListener(taskSnapshot -> {
+                    progressBar.setVisibility(View.GONE);
+                    System.out.println("File Uploaded Successfully");
+                    partitura = new Partitura(
+                            mAuth.getCurrentUser().getEmail(),
+                            etName.getText().toString(),
+                            etInstrument.getText().toString(),
+                            etAuthor.getText().toString(),
+                            actvCategoria.getAdapter().toString(),
+                            taskSnapshot.getMetadata().getReference().getDownloadUrl().toString()
+                    );
+                    mDatabaseReference.child(mDatabaseReference.push().getKey()).setValue(partitura);
+                    Toast.makeText(this, "File Uploaded Successfully",Toast.LENGTH_LONG).show();
+
+                })
+                .addOnFailureListener(exception -> Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show())
+                .addOnProgressListener(taskSnapshot -> {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    int progreso = (int) progress;
+                    tvProgress.setText(progreso + "% Uploading...");
+                });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //when the user choses the file
+        if (requestCode == PICK_PDF_FILE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            //if a file is selected
+            if (data.getData() != null ) {
+                //uploading the file
+                button.setOnClickListener(v -> {
+                    uploadFile(data.getData());
+                    finish();
+                });
+            } else {
+                Toast.makeText(this, "No file chosen", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
                 //Validación de datos
-                /*Intent intent = new Intent();
                 for (EditText campo : datos) {
                     if (campo.getText().length() < 1) {
                         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
@@ -109,14 +187,9 @@ public class AddActivity extends AppCompatActivity {
                         break;
                     }
                     else{
-                        partitura.setNombre(etName.getText().toString());
-                        partitura.setAutor(etAuthor.getText().toString());
-                        partitura.setInstrumento(etInstrument.getText().toString());
-                        getIntent().putExtra(EXTRA_PARTITURA_RESULT, partitura);
-                        setResult(RESULT_OK, getIntent());
-                        finish();
+                        button.performClick();
                     }
-                }*/
+                }
                 break;
             default:
                 return super.onOptionsItemSelected(item);

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "721660928398",
+    "firebase_url": "https://kotta-a14a4-default-rtdb.firebaseio.com",
     "project_id": "kotta-a14a4",
     "storage_bucket": "kotta-a14a4.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "721660928398-ljm1vejlu1t9a9fuf5hkujm0qnhe3db9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.lidia.iessochoa.kotta",
+            "certificate_hash": "3b8666cf2ce87f01cd2d7d9fccb7880a0c1e0de2"
+          }
+        },
         {
           "client_id": "721660928398-hot5k3thojb3bgri4598rrbjjr2ba0le.apps.googleusercontent.com",
           "client_type": 3
