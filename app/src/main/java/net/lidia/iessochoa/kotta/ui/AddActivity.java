@@ -78,7 +78,6 @@ public class AddActivity extends AppCompatActivity {
         actv.setAdapter(adaptador1);
 
         ivPDF.setOnClickListener(v -> {
-            //directorio = Environment.getExternalStorageDirectory().getPath();
             getPDF();
         });
 
@@ -111,21 +110,11 @@ public class AddActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select PDF"), PICK_PDF_FILE);
     }
 
-    private void openFile(Uri pickerInitialUri) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/pdf");
 
-        // Optionally, specify a URI for the file that should appear in the
-        // system file picker when it loads.
-        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
-
-        startActivityForResult(intent, PICK_PDF_FILE);
-    }
-
-    //this method is uploading the file
-    //the code is same as the previous tutorial
-    //so we are not explaining it
+    /**
+     * This method is uploading the file
+     * @param data
+     */
     private void uploadFile(Uri data) {
         progressBar.setVisibility(View.VISIBLE);
         StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + System.currentTimeMillis() + ".pdf");

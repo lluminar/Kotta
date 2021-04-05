@@ -127,6 +127,7 @@
         android:id="@+id/button2"
         android:layout_width="1dp"
         android:layout_height="1dp"
+        android:enabled="false"
         android:text="Button"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"

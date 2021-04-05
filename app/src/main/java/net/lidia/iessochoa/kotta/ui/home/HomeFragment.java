@@ -64,10 +64,6 @@ public class HomeFragment extends Fragment {
         fabAdd.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddActivity.class);
             startActivity(intent);
-            /*intent.putExtra(
-                    AddActivity.EXTRA_PARTITURA, new Partitura(Calendar.getInstance().getTime(),
-                    null,null,null,null,null));
-            startActivityForResult(intent,OPTION_REQUEST_NUEVA);*/
         });
 
         /*rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));

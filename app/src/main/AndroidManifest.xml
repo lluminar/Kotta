@@ -13,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kotta">
         <activity
-            android:name=".ui.AddActivity">
+            android:name=".ui.AddActivity"
+            android:theme="@style/Theme.App">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.PrincipalActivity" />
