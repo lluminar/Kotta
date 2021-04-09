@@ -175,9 +175,7 @@ public class AddActivity extends AppCompatActivity {
                         dialogo.show();
                         break;
                     }
-                    else{
-                        button.performClick();
-                    }
+                    else button.performClick();
                 }
                 break;
             default:

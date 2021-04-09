@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav01"
+            android:icon="@drawable/ic_user_24px"
+            android:title="Item 1" />
+        <item
+            android:id="@+id/nav02"
+            android:icon="@drawable/ic_desplegable"
+            android:title="Item 2" />
+        <item
+            android:id="@+id/nav03"
+            android:icon="@drawable/ic_desplegable"
+            android:title="Item 2" />
+        <item
+            android:id="@+id/nav04"
+            android:icon="@drawable/ic_desplegable"
+            android:title="Item 2" /> <item
+            android:id="@+id/nav05"
+            android:icon="@drawable/ic_desplegable"
+            android:title="Item 2" />
+    </group>
+</menu>
