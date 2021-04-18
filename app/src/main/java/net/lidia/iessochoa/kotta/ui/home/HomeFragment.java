@@ -13,32 +13,45 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
+import net.lidia.iessochoa.kotta.model.PartituraDao;
+import net.lidia.iessochoa.kotta.model.PartituraDaoImpl;
 import net.lidia.iessochoa.kotta.ui.AddActivity;
 import net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_CANCELED;
 
 public class HomeFragment extends Fragment {
     public final static int OPTION_REQUEST_NUEVA = 0;
 
-    private HomeViewModel homeViewModel;
     private PartituraAdapter adapter;
     private AppCompatActivity activity;
-
-    FirebaseFirestore firebaseFirestore;
+    private HomeViewModel homeViewModel;
     private RecyclerView rvPartituras;
+    PartituraDao partituraDaoImpl;
 
     private BottomAppBar bottomAppBar;
     private FloatingActionButton fabAdd;
@@ -50,13 +63,10 @@ public class HomeFragment extends Fragment {
         rvPartituras = root.findViewById(R.id.rvPartituras);
         bottomAppBar = root.findViewById(R.id.bottomAppBar);
         fabAdd = root.findViewById(R.id.fabAdd);
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        /*homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        adapter = new PartituraAdapter();
-
-
-        homeViewModel.getAllPartituras().observe(this.getViewLifecycleOwner(),
-                partituras -> adapter.setListaPartituras(partituras));*/
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        partituraDaoImpl = new PartituraDaoImpl();
+        //partituraDaoImpl.AllPartituras();
+        //adapter = new PartituraAdapter();
         return root;
     }
 
@@ -75,11 +85,15 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        /*rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvPartituras.setAdapter(adapter);
+        rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
+        getPartituras();
 
-        homeViewModel.getAllPartituras().observe(getViewLifecycleOwner(),partituras ->
-                adapter.setListaPartituras(partituras));*/
+    }
+
+    private void getPartituras() {
+        ArrayList<Partitura>partituras = partituraDaoImpl.AllPartituras();
+        adapter = new PartituraAdapter(partituras);
+        rvPartituras.setAdapter(adapter);
     }
 
     @Override

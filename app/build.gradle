@@ -39,6 +39,8 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-firestore:7.1.1'
     implementation 'com.google.firebase:firebase-storage:19.2.2'
     implementation 'com.google.firebase:firebase-database:19.7.0'
+    implementation 'com.firebaseui:firebase-ui-database:6.2.1'
+
 
     implementation 'androidx.navigation:navigation-fragment:2.3.3'
     implementation 'androidx.navigation:navigation-ui:2.3.3'

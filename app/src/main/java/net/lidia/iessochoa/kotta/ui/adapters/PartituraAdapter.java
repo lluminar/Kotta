@@ -1,5 +1,6 @@
 package net.lidia.iessochoa.kotta.ui.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +11,21 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.PartituraViewHolder> {
-    private List<Partitura> partituraList;
+    private ArrayList<Partitura> partituraList;
     private OnItemClickElementoListener listener;
+
+    public PartituraAdapter(ArrayList<Partitura> partituraList) {
+        this.partituraList = partituraList;
+    }
 
     @NonNull
     @Override
@@ -37,9 +45,8 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
     public void onBindViewHolder(@NonNull PartituraViewHolder holder, int position) {
         if (partituraList != null) {
             final Partitura partitura = partituraList.get(position);
-            holder.tvNameCv.setText(partitura.getNombre());
-            holder.tvInstrument.setText(partitura.getInstrumento());
-            holder.tvAuthor.setText(partitura.getAutor());
+            holder.bind(partitura);
+
             //We assign the listener
             if (listener!=null)
                 holder.itemView.setOnClickListener(v -> listener.onItemClickElemento(partitura));
@@ -52,14 +59,15 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
      */
     @Override
     public int getItemCount() {
-        if (partituraList != null) return partituraList.size();
+        if (partituraList != null)
+            return partituraList.size();
         else return 0;
     }
 
     /**
      * When database is modify, update the recycleview
      */
-    public void setListaPartituras(List<Partitura> partituras){
+    public void setListaPartituras(ArrayList<Partitura> partituras){
         partituraList = partituras;
         notifyDataSetChanged();
     }
@@ -72,11 +80,8 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
     }
 
     public class PartituraViewHolder extends RecyclerView.ViewHolder {
-        private ImageView ivCategory;
-        private TextView tvNameCv;
-        private TextView tvInstrument;
-        private TextView tvAuthor;
-        private ImageView ivDownload;
+        private ImageView ivCategory, ivDownload;
+        private TextView tvNameCv, tvInstrument, tvAuthor;
         private Partitura partitura;
         private CardView itemPartitura;
 
@@ -95,6 +100,13 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
             });
         }
         public Partitura getPartitura() { return partitura; }
+
+        public void bind(Partitura partitura) {
+//          Glide.with(itemView.getContext()).load(partitura.getPdf()).into(image);
+            tvNameCv.setText(partitura.getName());
+            tvInstrument.setText(partitura.getInstrumento());
+            tvAuthor.setText(partitura.getAutor());
+        }
     }
 
     public interface OnItemClickElementoListener {

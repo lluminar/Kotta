@@ -16,6 +16,9 @@ public class Partitura {
     private String categoria;
     private String pdf;
 
+    public Partitura() {
+    }
+
     public Partitura(String user, String nombre, String instrumento, String autor, String categoria, String pdf) {
         this.user = user;
         this.nombre = nombre;
@@ -41,7 +44,7 @@ public class Partitura {
         this.fecha = fecha;
     }
 
-    public String getNombre() {
+    public String getName() {
         return nombre;
     }
 
