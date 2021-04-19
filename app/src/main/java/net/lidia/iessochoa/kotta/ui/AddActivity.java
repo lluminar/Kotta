@@ -1,11 +1,12 @@
 package net.lidia.iessochoa.kotta.ui;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -30,6 +32,7 @@ import com.google.firebase.storage.UploadTask;
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
+import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 import net.lidia.iessochoa.kotta.ui.home.HomeViewModel;
 
 public class AddActivity extends AppCompatActivity {
@@ -45,8 +48,11 @@ public class AddActivity extends AppCompatActivity {
     private EditText etAuthor;
     private ImageView ivPDF;
     private AutoCompleteTextView actvCategoria;
+    private Toolbar toolbar;
     private ProgressBar progressBar;
     private TextView tvProgress;
+    private BottomAppBar bottomAppBar;
+
     private String[] categorias;
     Button button;
     private EditText[] datos;
@@ -68,7 +74,9 @@ public class AddActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvProgress = findViewById(R.id.tvProgress);
         button = findViewById(R.id.button2);
-
+        toolbar = findViewById(R.id.toolbarAdd);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("");
         categorias = getResources().getStringArray(R.array.category);
         //Se crean los menús para los spinners
         ArrayAdapter<String> adaptador1;
@@ -86,6 +94,11 @@ public class AddActivity extends AppCompatActivity {
                 etInstrument,
                 etAuthor
         };
+
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent intent = new Intent(this, PrincipalActivity.class);
+            startActivity(intent);
+        });
     }
 
     /**

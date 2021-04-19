@@ -8,6 +8,15 @@
     android:background="@color/back"
     tools:context=".ui.AddActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarAdd"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:menu="@menu/add_partitura"
+        app:navigationIcon="@drawable/ic_baseline_close_24"
+        tools:ignore="MissingConstraints" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/name"
         style="@style/Widget.Kotta.TextInputLayout"
@@ -20,7 +29,7 @@
         app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarAdd"
         tools:ignore="MissingConstraints">
 
         <com.google.android.material.textfield.TextInputEditText
