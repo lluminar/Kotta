@@ -37,6 +37,8 @@ import net.lidia.iessochoa.kotta.ui.home.HomeViewModel;
 
 public class AddActivity extends AppCompatActivity {
     private final int PICK_PDF_FILE = 2;
+    private static final int MY_PERMISSIONS = 100;
+
     private FirebaseAuth mAuth;
     private StorageReference mStorageReference;
     private DatabaseReference mDatabaseReference;
@@ -51,10 +53,10 @@ public class AddActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ProgressBar progressBar;
     private TextView tvProgress;
-    private BottomAppBar bottomAppBar;
 
+    private Uri uriPDF = null;
     private String[] categorias;
-    Button button;
+
     private EditText[] datos;
 
     @Override
@@ -73,10 +75,8 @@ public class AddActivity extends AppCompatActivity {
         ivPDF = findViewById(R.id.ivPdf);
         progressBar = findViewById(R.id.progressBar);
         tvProgress = findViewById(R.id.tvProgress);
-        button = findViewById(R.id.button2);
         toolbar = findViewById(R.id.toolbarAdd);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("");
         categorias = getResources().getStringArray(R.array.category);
         //Se crean los menús para los spinners
         ArrayAdapter<String> adaptador1;
@@ -89,7 +89,7 @@ public class AddActivity extends AppCompatActivity {
             getPDF();
         });
 
-        datos = new EditText[]{
+        datos = new EditText[] {
                 etName,
                 etInstrument,
                 etAuthor
@@ -140,7 +140,7 @@ public class AddActivity extends AppCompatActivity {
                             etName.getText().toString(),
                             etInstrument.getText().toString(),
                             etAuthor.getText().toString(),
-                            actvCategoria.getAdapter().toString(),
+                            actvCategoria.getText().toString(),
                             taskSnapshot.getMetadata().getReference().getDownloadUrl().toString()
                     );
                     mDatabaseReference.child(mDatabaseReference.push().getKey()).setValue(partitura);
@@ -152,24 +152,23 @@ public class AddActivity extends AppCompatActivity {
                     double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
                     int progreso = (int) progress;
                     tvProgress.setText(progreso + "% Uploading...");
+                    progressBar.setProgress(progreso);
                 });
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //when the user choses the file
-        if (requestCode == PICK_PDF_FILE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
             //if a file is selected
-            if (data.getData() != null ) {
-                //uploading the file
-                button.setOnClickListener(v -> {
-                    uploadFile(data.getData());
-                    finish();
-                });
-            } else {
-                Toast.makeText(this, "No file chosen", Toast.LENGTH_SHORT).show();
+            switch (requestCode) {
+                case PICK_PDF_FILE:
+                    uriPDF = data.getData();
+                    break;
+                default:
+                    Toast.makeText(this, "No file chosen", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     }
@@ -184,11 +183,15 @@ public class AddActivity extends AppCompatActivity {
                         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
                         dialogo.setTitle(R.string.Aviso);// titulo y mensaje
                         dialogo.setMessage(R.string.vacio);
-                        dialogo.setPositiveButton(android.R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss());
+                        dialogo.setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
+                                dialogInterface.dismiss());
                         dialogo.show();
                         break;
+                    } else {
+                        uploadFile(uriPDF);
+                        finish();
+                        break;
                     }
-                    else button.performClick();
                 }
                 break;
             default:

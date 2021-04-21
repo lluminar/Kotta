@@ -65,8 +65,8 @@ public class HomeFragment extends Fragment {
         fabAdd = root.findViewById(R.id.fabAdd);
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         partituraDaoImpl = new PartituraDaoImpl();
-        //partituraDaoImpl.AllPartituras();
-        //adapter = new PartituraAdapter();
+        rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
+        getPartituras();
         return root;
     }
 
@@ -84,10 +84,6 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), AddActivity.class);
             startActivity(intent);
         });
-
-        rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
-        getPartituras();
-
     }
 
     private void getPartituras() {
