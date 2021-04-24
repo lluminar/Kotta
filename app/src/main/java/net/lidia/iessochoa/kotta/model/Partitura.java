@@ -2,29 +2,27 @@ package net.lidia.iessochoa.kotta.model;
 
 import com.google.firebase.firestore.ServerTimestamp;
 
-import java.text.DateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class Partitura {
     private String user;
     @ServerTimestamp
-    private Date fecha;
-    private String nombre;
-    private String instrumento;
-    private String autor;
-    private String categoria;
+    private Date date;
+    private String name;
+    private String instrument;
+    private String author;
+    private String category;
     private String pdf;
 
     public Partitura() {
     }
 
-    public Partitura(String user, String nombre, String instrumento, String autor, String categoria, String pdf) {
+    public Partitura(String user, String name, String instrument, String author, String category, String pdf) {
         this.user = user;
-        this.nombre = nombre;
-        this.instrumento = instrumento;
-        this.autor = autor;
-        this.categoria = categoria;
+        this.name = name;
+        this.instrument = instrument;
+        this.author = author;
+        this.category = category;
         this.pdf = pdf;
     }
 
@@ -36,44 +34,44 @@ public class Partitura {
         this.user = user;
     }
 
-    public Date getFecha() {
-        return fecha;
+    public Date getDate() {
+        return date;
     }
 
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public String getName() {
-        return nombre;
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getInstrumento() {
-        return instrumento;
+    public String getInstrument() {
+        return instrument;
     }
 
-    public void setInstrumento(String instrumento) {
-        this.instrumento = instrumento;
+    public void setInstrument(String instrument) {
+        this.instrument = instrument;
     }
 
-    public String getAutor() {
-        return autor;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setAutor(String autor) {
-        this.autor = autor;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
-    public String getCategoria() {
-        return categoria;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getPdf() {

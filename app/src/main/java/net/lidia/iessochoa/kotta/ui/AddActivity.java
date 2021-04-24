@@ -1,15 +1,18 @@
 package net.lidia.iessochoa.kotta.ui;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -19,12 +22,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -35,13 +41,16 @@ import net.lidia.iessochoa.kotta.model.Partitura;
 import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 import net.lidia.iessochoa.kotta.ui.home.HomeViewModel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AddActivity extends AppCompatActivity {
     private final int PICK_PDF_FILE = 2;
     private static final int MY_PERMISSIONS = 100;
 
     private FirebaseAuth mAuth;
     private StorageReference mStorageReference;
-    private DatabaseReference mDatabaseReference;
+    private FirebaseFirestore mDatabaseReference;
 
     private Partitura partitura;
 
@@ -65,7 +74,7 @@ public class AddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add);
 
         mStorageReference = FirebaseStorage.getInstance().getReference();
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS);
+        mDatabaseReference = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
         etName = findViewById(R.id.etName);
@@ -134,16 +143,17 @@ public class AddActivity extends AppCompatActivity {
         sRef.putFile(data)
                 .addOnSuccessListener(taskSnapshot -> {
                     progressBar.setVisibility(View.GONE);
-                    System.out.println("File Uploaded Successfully");
                     partitura = new Partitura(
-                            mAuth.getCurrentUser().getEmail(),
-                            etName.getText().toString(),
-                            etInstrument.getText().toString(),
-                            etAuthor.getText().toString(),
-                            actvCategoria.getText().toString(),
-                            taskSnapshot.getMetadata().getReference().getDownloadUrl().toString()
+                        mAuth.getCurrentUser().getEmail(),
+                        etName.getText().toString(),
+                        etInstrument.getText().toString(),
+                        etAuthor.getText().toString(),
+                        actvCategoria.getText().toString(),
+                        taskSnapshot.getMetadata().getReference().getDownloadUrl().toString()
                     );
-                    mDatabaseReference.child(mDatabaseReference.push().getKey()).setValue(partitura);
+                    mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document().set(partitura);
+                    ocultarTeclado();
+                    //mDatabaseReference.child(mDatabaseReference.push().getKey()).setValue(partitura);
                     Toast.makeText(this, "File Uploaded Successfully",Toast.LENGTH_LONG).show();
 
                 })
@@ -198,5 +208,16 @@ public class AddActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    /**
+     * Permite ocultar el teclado
+     */
+    private void ocultarTeclado() {
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(etAuthor.getWindowToken(), 0);
+        }
     }
 }

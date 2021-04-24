@@ -1,6 +1,5 @@
 package net.lidia.iessochoa.kotta.ui.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +10,20 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.PartituraViewHolder> {
-    private ArrayList<Partitura> partituraList;
+public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, PartituraAdapter.PartituraViewHolder> {
     private OnItemClickElementoListener listener;
 
-    public PartituraAdapter(ArrayList<Partitura> partituraList) {
-        this.partituraList = partituraList;
-    }
+    public PartituraAdapter(@NonNull FirestoreRecyclerOptions options) { super(options); }
 
     @NonNull
     @Override
@@ -35,41 +33,14 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
         return new PartituraViewHolder(itemView);
     }
 
-    /**
-     * When the adapter is going to show a new item, it calls this method and indicates the position
-     * in the list of the element to show.
-     * @param holder: Where we show the data
-     * @param position
-     */
     @Override
-    public void onBindViewHolder(@NonNull PartituraViewHolder holder, int position) {
-        if (partituraList != null) {
-            final Partitura partitura = partituraList.get(position);
-            holder.bind(partitura);
+    protected void onBindViewHolder(@NonNull PartituraViewHolder holder, int position, @NonNull Partitura model) {
+        FirebaseUser user  = FirebaseAuth.getInstance().getCurrentUser();
+        holder.bind(model);
+        //We assign the listener
+        if (listener!=null)
+            holder.itemView.setOnClickListener(v -> listener.onItemClickElemento(model));
 
-            //We assign the listener
-            if (listener!=null)
-                holder.itemView.setOnClickListener(v -> listener.onItemClickElemento(partitura));
-        }
-    }
-
-    /**
-     * Count the number of music sheet
-     * @return: number of partitura
-     */
-    @Override
-    public int getItemCount() {
-        if (partituraList != null)
-            return partituraList.size();
-        else return 0;
-    }
-
-    /**
-     * When database is modify, update the recycleview
-     */
-    public void setListaPartituras(ArrayList<Partitura> partituras){
-        partituraList = partituras;
-        notifyDataSetChanged();
     }
 
     /**
@@ -94,18 +65,18 @@ public class PartituraAdapter extends RecyclerView.Adapter<PartituraAdapter.Part
             ivDownload = itemView.findViewById(R.id.ivDownload);
             itemPartitura = itemView.findViewById(R.id.cvItem);
 
-            itemPartitura.setOnClickListener(v -> {
+            /*itemPartitura.setOnClickListener(v -> {
                 if (listener != null)
                     listener.onItemClickElemento(partituraList.get(PartituraViewHolder.this.getAdapterPosition()));
-            });
+            });*/
         }
         public Partitura getPartitura() { return partitura; }
 
         public void bind(Partitura partitura) {
 //          Glide.with(itemView.getContext()).load(partitura.getPdf()).into(image);
             tvNameCv.setText(partitura.getName());
-            tvInstrument.setText(partitura.getInstrumento());
-            tvAuthor.setText(partitura.getAutor());
+            tvInstrument.setText(partitura.getInstrument());
+            tvAuthor.setText(partitura.getAuthor());
         }
     }
 

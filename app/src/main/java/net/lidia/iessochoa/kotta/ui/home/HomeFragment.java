@@ -19,7 +19,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.firebase.ui.firestore.ChangeEventListener;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -28,7 +31,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
@@ -66,7 +72,6 @@ public class HomeFragment extends Fragment {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         partituraDaoImpl = new PartituraDaoImpl();
         rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
-        getPartituras();
         return root;
     }
 
@@ -84,12 +89,53 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), AddActivity.class);
             startActivity(intent);
         });
+        createAdapter();
     }
 
-    private void getPartituras() {
-        ArrayList<Partitura>partituras = partituraDaoImpl.AllPartituras();
-        adapter = new PartituraAdapter(partituras);
+    private void createAdapter() {
+        Query query = partituraDaoImpl.AllPartituras();
+        FirestoreRecyclerOptions<Partitura> options = new FirestoreRecyclerOptions.Builder<Partitura>()
+                //consulta y clase en la que se guarda los datos
+                .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
+        //si el usuario ya habia seleccionado otra conferencia, paramos las escucha
+        if (adapter != null) adapter.stopListening();
+        //Creamos el adaptador
+        adapter = new PartituraAdapter(options);
+        //asignamos el adaptador
         rvPartituras.setAdapter(adapter);
+        //comenzamos a escuchar. Normalmente solo tenemos un adaptador, esto tenemos que
+        // hacerlo en el evento onStar, como indica la documentación
+        adapter.startListening();
+        //Podemos reaccionar ante cambios en la query(se añade un mensaje).
+        // Nosotros, lo que necesitamos es mover el scroll del recyclerView al inicio para ver el mensaje nuevo
+        adapter.getSnapshots().addChangeEventListener(new ChangeEventListener() {
+            @Override
+            public void onChildChanged(@NonNull ChangeEventType type, @NonNull
+                    DocumentSnapshot snapshot, int newIndex, int oldIndex) {
+                rvPartituras.smoothScrollToPosition(0);
+            }
+
+            @Override
+            public void onDataChanged() {
+            }
+
+            @Override
+            public void onError(@NonNull FirebaseFirestoreException e) {
+            }
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+        rvPartituras.setAdapter(adapter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 
     @Override
