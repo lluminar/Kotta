@@ -8,31 +8,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.common.ChangeEventType;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.firestore.ChangeEventListener;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 
@@ -44,9 +35,6 @@ import net.lidia.iessochoa.kotta.ui.AddActivity;
 import net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static android.app.Activity.RESULT_CANCELED;
 
@@ -100,7 +88,7 @@ public class HomeFragment extends Fragment {
         //si el usuario ya habia seleccionado otra conferencia, paramos las escucha
         if (adapter != null) adapter.stopListening();
         //Creamos el adaptador
-        adapter = new PartituraAdapter(options);
+        adapter = new PartituraAdapter(options, getContext());
         //asignamos el adaptador
         rvPartituras.setAdapter(adapter);
         //comenzamos a escuchar. Normalmente solo tenemos un adaptador, esto tenemos que

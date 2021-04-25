@@ -1,5 +1,6 @@
 package net.lidia.iessochoa.kotta.ui.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,15 @@ import com.google.firebase.auth.FirebaseUser;
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
 
-import java.util.ArrayList;
-
 public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, PartituraAdapter.PartituraViewHolder> {
+
+    private final Context mContext;
     private OnItemClickElementoListener listener;
 
-    public PartituraAdapter(@NonNull FirestoreRecyclerOptions options) { super(options); }
+    public PartituraAdapter(@NonNull FirestoreRecyclerOptions options, Context mContext) {
+        super(options);
+        this.mContext = mContext;
+    }
 
     @NonNull
     @Override
@@ -37,10 +41,10 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
     protected void onBindViewHolder(@NonNull PartituraViewHolder holder, int position, @NonNull Partitura model) {
         FirebaseUser user  = FirebaseAuth.getInstance().getCurrentUser();
         holder.bind(model);
+
         //We assign the listener
         if (listener!=null)
             holder.itemView.setOnClickListener(v -> listener.onItemClickElemento(model));
-
     }
 
     /**
@@ -77,6 +81,32 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             tvNameCv.setText(partitura.getName());
             tvInstrument.setText(partitura.getInstrument());
             tvAuthor.setText(partitura.getAuthor());
+            switch (partitura.getCategory()) {
+                case "Videojuegos":
+                    ivCategory.setImageResource(R.drawable.ic_games);
+                    itemPartitura.setCardBackgroundColor(mContext.getResources().getColor(R.color.blueItem));
+                    break;
+                case "Pop":
+                    ivCategory.setImageResource(R.drawable.ic_pop);
+                    itemPartitura.setCardBackgroundColor(mContext.getResources().getColor(R.color.orangeItem));
+                    break;
+                case "Clásica":
+                    ivCategory.setImageResource(R.drawable.ic_clasic);
+                    itemPartitura.setCardBackgroundColor(mContext.getResources().getColor(R.color.greenItem));
+                    break;
+                case "Películas":
+                    ivCategory.setImageResource(R.drawable.ic_pelicula);
+                    itemPartitura.setCardBackgroundColor(mContext.getResources().getColor(R.color.yellowItem));
+                    break;
+                case "Baladas":
+                    ivCategory.setImageResource(R.drawable.ic_balada);
+                    itemPartitura.setCardBackgroundColor(mContext.getResources().getColor(R.color.pinkItem));
+                    break;
+                case "Rock":
+                    ivCategory.setImageResource(R.drawable.ic_rock);
+                    itemPartitura.setCardBackgroundColor(mContext.getResources().getColor(R.color.greyItem));
+                    break;
+            }
         }
     }
 

@@ -22,7 +22,7 @@
             android:id="@+id/tvNameCv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="24dp"
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:maxLines="1"
@@ -38,7 +38,7 @@
             android:id="@+id/tvInstrumentCv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
@@ -55,7 +55,7 @@
             android:id="@+id/tvAuthorCv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="24dp"
             android:text="TextView"
             card_view:layout_constraintBottom_toBottomOf="@+id/ivCategoryCv"
             card_view:layout_constraintStart_toEndOf="@+id/ivCategoryCv" />
@@ -64,13 +64,13 @@
             android:id="@+id/ivCategoryCv"
             android:layout_width="93dp"
             android:layout_height="101dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toTopOf="parent"
-            card_view:srcCompat="@drawable/ic_add_pdf" />
+            card_view:srcCompat="@drawable/ic_games" />
 
         <TextView
             android:id="@+id/tvSizeCv"

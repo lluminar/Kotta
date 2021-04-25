@@ -26,6 +26,7 @@
 
     <string name="Aviso">Aviso</string>
     <string name="vacio">Es necesario rellenar todos los campos</string>
+    <string name="pdfNull">Se debe añadir la partitura</string>
 
     <string-array name="category">
         <item>Rock</item>

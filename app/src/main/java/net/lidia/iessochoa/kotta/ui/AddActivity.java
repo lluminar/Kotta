@@ -65,7 +65,6 @@ public class AddActivity extends AppCompatActivity {
 
     private Uri uriPDF = null;
     private String[] categorias;
-
     private EditText[] datos;
 
     @Override
@@ -85,6 +84,7 @@ public class AddActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvProgress = findViewById(R.id.tvProgress);
         toolbar = findViewById(R.id.toolbarAdd);
+
         setSupportActionBar(toolbar);
         categorias = getResources().getStringArray(R.array.category);
         //Se crean los menús para los spinners
@@ -101,7 +101,7 @@ public class AddActivity extends AppCompatActivity {
         datos = new EditText[] {
                 etName,
                 etInstrument,
-                etAuthor
+                etAuthor,
         };
 
         toolbar.setNavigationOnClickListener(v -> {
@@ -132,7 +132,6 @@ public class AddActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select PDF"), PICK_PDF_FILE);
     }
 
-
     /**
      * This method is uploading the file
      * @param data
@@ -153,7 +152,6 @@ public class AddActivity extends AppCompatActivity {
                     );
                     mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document().set(partitura);
                     ocultarTeclado();
-                    //mDatabaseReference.child(mDatabaseReference.push().getKey()).setValue(partitura);
                     Toast.makeText(this, "File Uploaded Successfully",Toast.LENGTH_LONG).show();
 
                 })
@@ -183,19 +181,27 @@ public class AddActivity extends AppCompatActivity {
         }
     }
 
+    public void sendAlert(int advice) {
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
+        dialogo.setTitle(R.string.Aviso);// titulo y mensaje
+        dialogo.setMessage(advice);
+        dialogo.setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
+                dialogInterface.dismiss());
+        dialogo.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
                 //Validación de datos
                 for (EditText campo : datos) {
-                    if (campo.getText().length() < 1) {
-                        AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
-                        dialogo.setTitle(R.string.Aviso);// titulo y mensaje
-                        dialogo.setMessage(R.string.vacio);
-                        dialogo.setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
-                                dialogInterface.dismiss());
-                        dialogo.show();
+                    if (campo.getText().length() < 1 || actvCategoria.getText().toString().equals("")) {
+                        sendAlert(R.string.vacio);
+                        break;
+                    }
+                    if (uriPDF == null) {
+                        sendAlert(R.string.pdfNull);
                         break;
                     } else {
                         uploadFile(uriPDF);
