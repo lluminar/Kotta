@@ -13,15 +13,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
 
 public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, PartituraAdapter.PartituraViewHolder> {
 
     private final Context mContext;
+    private StorageReference mStorageReference;
+
     private OnItemClickElementoListener listener;
 
     public PartituraAdapter(@NonNull FirestoreRecyclerOptions options, Context mContext) {
@@ -56,7 +64,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
 
     public class PartituraViewHolder extends RecyclerView.ViewHolder {
         private ImageView ivCategory, ivDownload;
-        private TextView tvNameCv, tvInstrument, tvAuthor;
+        private TextView tvNameCv, tvInstrument, tvAuthor, tvSize;
         private Partitura partitura;
         private CardView itemPartitura;
 
@@ -67,6 +75,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             tvInstrument = itemView.findViewById(R.id.tvInstrumentCv);
             tvAuthor = itemView.findViewById(R.id.tvAuthorCv);
             ivDownload = itemView.findViewById(R.id.ivDownload);
+            tvSize = itemView.findViewById(R.id.tvSizeCv);
             itemPartitura = itemView.findViewById(R.id.cvItem);
 
             /*itemPartitura.setOnClickListener(v -> {
@@ -81,6 +90,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             tvNameCv.setText(partitura.getName());
             tvInstrument.setText(partitura.getInstrument());
             tvAuthor.setText(partitura.getAuthor());
+
             switch (partitura.getCategory()) {
                 case "Videojuegos":
                     ivCategory.setImageResource(R.drawable.ic_games);

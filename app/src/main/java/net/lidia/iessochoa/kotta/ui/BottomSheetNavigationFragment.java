@@ -33,10 +33,8 @@ import net.lidia.iessochoa.kotta.R;
  */
 public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_ITEM_COUNT = "item_count";
 
-    // TODO: Customize parameters
     public static BottomSheetNavigationFragment newInstance() {
         final BottomSheetNavigationFragment fragment = new BottomSheetNavigationFragment();
         final Bundle args = new Bundle();

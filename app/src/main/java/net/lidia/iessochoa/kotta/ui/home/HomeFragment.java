@@ -43,7 +43,6 @@ public class HomeFragment extends Fragment {
 
     private PartituraAdapter adapter;
     private AppCompatActivity activity;
-    private HomeViewModel homeViewModel;
     private RecyclerView rvPartituras;
     PartituraDao partituraDaoImpl;
 
@@ -57,7 +56,6 @@ public class HomeFragment extends Fragment {
         rvPartituras = root.findViewById(R.id.rvPartituras);
         bottomAppBar = root.findViewById(R.id.bottomAppBar);
         fabAdd = root.findViewById(R.id.fabAdd);
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         partituraDaoImpl = new PartituraDaoImpl();
         rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
         return root;

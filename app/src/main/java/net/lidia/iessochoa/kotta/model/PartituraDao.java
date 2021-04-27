@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PartituraDao {
     Query AllPartituras();
+    Query getOwnPartituras();
 }
