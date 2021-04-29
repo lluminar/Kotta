@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,14 +36,15 @@ import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
 
 import static android.app.Activity.RESULT_CANCELED;
+import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
 
 public class HomeFragment extends Fragment {
-    public final static int OPTION_REQUEST_NUEVA = 0;
 
+    private String result;
     private PartituraAdapter adapter;
     private AppCompatActivity activity;
     private RecyclerView rvPartituras;
-    PartituraDao partituraDaoImpl;
+    private PartituraDao partituraDaoImpl;
 
     private BottomAppBar bottomAppBar;
     private FloatingActionButton fabAdd;
@@ -58,6 +58,7 @@ public class HomeFragment extends Fragment {
         fabAdd = root.findViewById(R.id.fabAdd);
         partituraDaoImpl = new PartituraDaoImpl();
         rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
+
         return root;
     }
 
@@ -80,6 +81,28 @@ public class HomeFragment extends Fragment {
 
     private void createAdapter() {
         Query query = partituraDaoImpl.AllPartituras();
+        if (result!=null) {
+            switch (result) {
+                case "Rock":
+                    query = partituraDaoImpl.getByCategory("Rock");
+                    break;
+                case "Pop":
+                    query = partituraDaoImpl.getByCategory("Pop");
+                    break;
+                case "3":
+                    query = partituraDaoImpl.getByCategory("Clásica");
+                    break;
+                case "fre":
+                    query = partituraDaoImpl.getByCategory("Videojuegos");
+                    break;
+                case "5":
+                    query = partituraDaoImpl.getByCategory("Película");
+                    break;
+                case "6":
+                    query = partituraDaoImpl.getByCategory("Baladas");
+                    break;
+            }
+        }
         FirestoreRecyclerOptions<Partitura> options = new FirestoreRecyclerOptions.Builder<Partitura>()
                 //consulta y clase en la que se guarda los datos
                 .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
@@ -144,10 +167,9 @@ public class HomeFragment extends Fragment {
 
         if (resultCode != RESULT_CANCELED) {
             // De lo contrario, recogemos el resultado de la segunda actividad.
-            switch (requestCode) {
-                case OPTION_REQUEST_NUEVA:
-                    break;
-            }
+            Bundle bundle = getArguments();
+            if (bundle != null)
+                result = bundle.getString(EXTRA_DATOS_RESULTADO);
         }
     }
 }

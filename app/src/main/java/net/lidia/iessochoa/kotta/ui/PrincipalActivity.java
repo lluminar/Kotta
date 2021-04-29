@@ -90,16 +90,13 @@ public class PrincipalActivity extends AppCompatActivity {
 
     private void logOut() {
         mAuth.signOut();
-        mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(mainActivity);
-                    PrincipalActivity.this.finish();
-                } else
-                    Toast.makeText(getApplicationContext(), "Logout error",Toast.LENGTH_LONG).show();
-            }
+        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(mainActivity);
+                PrincipalActivity.this.finish();
+            } else
+                Toast.makeText(getApplicationContext(), "Logout error",Toast.LENGTH_LONG).show();
         });
         Intent mainActivity = new Intent(this, MainActivity.class);
         startActivity(mainActivity);

@@ -2,23 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="none">
         <item
-            android:id="@+id/nav01"
-            android:icon="@drawable/ic_user_24px"
-            android:title="Item 1" />
+            android:id="@+id/navRock"
+            android:icon="@drawable/ic_rock"
+            android:title="@string/Rock" />
         <item
-            android:id="@+id/nav02"
-            android:icon="@drawable/ic_desplegable"
-            android:title="Item 2" />
+            android:id="@+id/navPop"
+            android:icon="@drawable/ic_pop"
+            android:title="@string/Pop" />
         <item
-            android:id="@+id/nav03"
-            android:icon="@drawable/ic_desplegable"
-            android:title="Item 2" />
+            android:id="@+id/navClassic"
+            android:icon="@drawable/ic_clasic"
+            android:title="@string/Clasica" />
         <item
-            android:id="@+id/nav04"
-            android:icon="@drawable/ic_desplegable"
-            android:title="Item 2" /> <item
-            android:id="@+id/nav05"
-            android:icon="@drawable/ic_desplegable"
-            android:title="Item 2" />
+            android:id="@+id/navVideoGames"
+            android:icon="@drawable/ic_games"
+            android:title="@string/Videojuegos" />
+        <item
+            android:id="@+id/navFilm"
+            android:icon="@drawable/ic_pelicula"
+            android:title="@string/Peliculas" />
+        <item
+            android:id="@+id/navBalads"
+            android:icon="@drawable/ic_balada"
+            android:title="@string/Baladas" />
+
     </group>
 </menu>

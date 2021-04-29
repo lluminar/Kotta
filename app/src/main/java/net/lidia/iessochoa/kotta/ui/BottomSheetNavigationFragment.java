@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -12,15 +11,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import net.lidia.iessochoa.kotta.R;
 
@@ -32,6 +25,9 @@ import net.lidia.iessochoa.kotta.R;
  * </pre>
  */
 public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
+
+    int result;
+    public final static String EXTRA_DATOS_RESULTADO = "datos";
 
     private static final String ARG_ITEM_COUNT = "item_count";
 
@@ -74,8 +70,33 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
         //implement navigation menu item click event
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
-                case R.id.nav01:
+                case R.id.navRock:
+                    Bundle bundle = new Bundle();
+                    bundle.putString(EXTRA_DATOS_RESULTADO, "Rock");
+                    this.setArguments(bundle);
+                    dismiss();
                     break;
+                case R.id.navPop:
+                    dismiss();
+
+                    break;
+                case R.id.navClassic:
+                    dismiss();
+
+                    break;
+                case R.id.navVideoGames:
+                    dismiss();
+
+                    break;
+                case R.id.navFilm:
+                    dismiss();
+
+                    break;
+                case R.id.navBalads:
+                    dismiss();
+
+                    break;
+                default:
             }
             return false;
         });
@@ -94,5 +115,4 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
             ((BottomSheetBehavior) behavior).setBottomSheetCallback(mBottomSheetBehaviorCallback);
         }
     }
-
 }

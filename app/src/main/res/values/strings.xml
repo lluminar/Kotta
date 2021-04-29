@@ -28,12 +28,19 @@
     <string name="vacio">Es necesario rellenar todos los campos</string>
     <string name="pdfNull">Se debe añadir la partitura</string>
 
+    <string name="Rock">Rock</string>
+    <string name="Pop">Pop</string>
+    <string name="Clasica">Clásica</string>
+    <string name="Videojuegos">Videojuegos</string>
+    <string name="Peliculas">Películas</string>
+    <string name="Baladas">Baladas</string>
+
     <string-array name="category">
-        <item>Rock</item>
-        <item>Pop</item>
-        <item>Clásica</item>
-        <item>Videojuegos</item>
-        <item>Películas</item>
-        <item>Baladas</item>
+        <item>@string/Rock</item>
+        <item>@string/Pop</item>
+        <item>@string/Clasica</item>
+        <item>@string/Videojuegos</item>
+        <item>@string/Peliculas</item>
+        <item>@string/Baladas</item>
     </string-array>
 </resources>
