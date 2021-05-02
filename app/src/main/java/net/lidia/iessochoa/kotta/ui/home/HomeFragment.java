@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -76,7 +78,13 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), AddActivity.class);
             startActivity(intent);
         });
+
         createAdapter();
+
+        adapter.setOnCLickElementoListener((snapshot, position) -> {
+            Partitura partitura = snapshot.toObject(Partitura.class);
+            String id = snapshot.getId();
+        });
     }
 
     private void createAdapter() {
@@ -122,6 +130,7 @@ public class HomeFragment extends Fragment {
             public void onChildChanged(@NonNull ChangeEventType type, @NonNull
                     DocumentSnapshot snapshot, int newIndex, int oldIndex) {
                 rvPartituras.smoothScrollToPosition(0);
+
             }
 
             @Override

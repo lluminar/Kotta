@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -47,12 +49,8 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
 
     @Override
     protected void onBindViewHolder(@NonNull PartituraViewHolder holder, int position, @NonNull Partitura model) {
-        FirebaseUser user  = FirebaseAuth.getInstance().getCurrentUser();
         holder.bind(model);
 
-        //We assign the listener
-        if (listener!=null)
-            holder.itemView.setOnClickListener(v -> listener.onItemClickElemento(model));
     }
 
     /**
@@ -78,10 +76,12 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             tvSize = itemView.findViewById(R.id.tvSizeCv);
             itemPartitura = itemView.findViewById(R.id.cvItem);
 
-            /*itemPartitura.setOnClickListener(v -> {
-                if (listener != null)
-                    listener.onItemClickElemento(partituraList.get(PartituraViewHolder.this.getAdapterPosition()));
-            });*/
+            itemPartitura.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+
+                if (position != RecyclerView.NO_POSITION && listener != null)
+                    listener.onItemClickElemento(getSnapshots().getSnapshot(position),position);
+            });
         }
         public Partitura getPartitura() { return partitura; }
 
@@ -121,6 +121,10 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
     }
 
     public interface OnItemClickElementoListener {
-        void onItemClickElemento(Partitura partitura);
+        void onItemClickElemento(DocumentSnapshot snapshot, int position);
+    }
+
+    public void setOnItemClickElementoListener(AdapterView.OnItemClickListener onItemClickElementoListener) {
+        this.listener = listener;
     }
 }
