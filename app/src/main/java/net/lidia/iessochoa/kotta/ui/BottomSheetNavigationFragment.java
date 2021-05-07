@@ -2,6 +2,7 @@ package net.lidia.iessochoa.kotta.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 
 /**
  * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
@@ -74,7 +76,6 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
                     Bundle bundle = new Bundle();
                     bundle.putString(EXTRA_DATOS_RESULTADO, "Rock");
                     this.setArguments(bundle);
-                    dismiss();
                     break;
                 case R.id.navPop:
                     dismiss();

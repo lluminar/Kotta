@@ -1,7 +1,9 @@
 package net.lidia.iessochoa.kotta.ui.home;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.firestore.ChangeEventListener;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,6 +31,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.Partitura;
@@ -34,8 +41,12 @@ import net.lidia.iessochoa.kotta.model.PartituraDao;
 import net.lidia.iessochoa.kotta.model.PartituraDaoImpl;
 import net.lidia.iessochoa.kotta.ui.AddActivity;
 import net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment;
+import net.lidia.iessochoa.kotta.ui.PDFReader;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
@@ -84,6 +95,32 @@ public class HomeFragment extends Fragment {
         adapter.setOnCLickElementoListener((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             String id = snapshot.getId();
+            Intent intent = new Intent(getActivity(), PDFReader.class);
+            intent.putExtra("partitura",partitura.getPdf());
+            startActivity(intent);
+        });
+
+        adapter.setListenerDownload((snapshot, position) -> {
+            Partitura partitura = snapshot.toObject(Partitura.class);
+            URL url = null;
+            try {
+                url = new URL(partitura.getPdf());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            FirebaseStorage fs =FirebaseStorage.getInstance();
+            StorageReference sr = fs.getReference().child("uploads/");
+            sr.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
         });
     }
 
@@ -130,7 +167,6 @@ public class HomeFragment extends Fragment {
             public void onChildChanged(@NonNull ChangeEventType type, @NonNull
                     DocumentSnapshot snapshot, int newIndex, int oldIndex) {
                 rvPartituras.smoothScrollToPosition(0);
-
             }
 
             @Override

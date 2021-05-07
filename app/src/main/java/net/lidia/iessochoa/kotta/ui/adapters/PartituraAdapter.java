@@ -1,12 +1,14 @@
 package net.lidia.iessochoa.kotta.ui.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -16,20 +18,27 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, PartituraAdapter.PartituraViewHolder> {
 
     private final Context mContext;
+    private OnItemClickDownloadListener listenerDownload;
+
     private StorageReference mStorageReference;
 
     private OnItemClickElementoListener listener;
@@ -50,7 +59,6 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
     @Override
     protected void onBindViewHolder(@NonNull PartituraViewHolder holder, int position, @NonNull Partitura model) {
         holder.bind(model);
-
     }
 
     /**
@@ -58,6 +66,10 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
      */
     public void setOnCLickElementoListener(OnItemClickElementoListener listener) {
         this.listener = listener;
+    }
+
+    public void setListenerDownload(OnItemClickDownloadListener listenerDownload) {
+        this.listenerDownload = listenerDownload;
     }
 
     public class PartituraViewHolder extends RecyclerView.ViewHolder {
@@ -81,6 +93,28 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
 
                 if (position != RecyclerView.NO_POSITION && listener != null)
                     listener.onItemClickElemento(getSnapshots().getSnapshot(position),position);
+            });
+
+            ivDownload.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && listenerDownload != null) {
+
+                        listenerDownload.onItemClickDownload(getSnapshots().getSnapshot(position),position);
+
+                }
+                    partitura.getPdf();
+
+                mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Got the download URL for 'users/me/profile.png'
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
             });
         }
         public Partitura getPartitura() { return partitura; }
@@ -126,5 +160,9 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
 
     public void setOnItemClickElementoListener(AdapterView.OnItemClickListener onItemClickElementoListener) {
         this.listener = listener;
+    }
+
+    public interface OnItemClickDownloadListener {
+        void onItemClickDownload(DocumentSnapshot snapshot, int position);
     }
 }
