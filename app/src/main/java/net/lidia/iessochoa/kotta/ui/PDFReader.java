@@ -1,9 +1,8 @@
 package net.lidia.iessochoa.kotta.ui;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,6 +24,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
+import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -35,52 +35,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
+import static net.lidia.iessochoa.kotta.ui.home.HomeFragment.EXTRA_PDF;
+
 public class PDFReader extends AppCompatActivity {
 
     private TextView tvView;
     private PDFView pdfView;
-    private FirebaseFirestore mDatabaseReference = FirebaseFirestore.getInstance();
-    private DocumentReference documentReference;
+    String resultado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf_reader);
-
         tvView = findViewById(R.id.tvViewer);
         pdfView = findViewById(R.id.pdfViewer);
 
-        /*Task<Uri> newTask = task.getResult().getMetadata().getReference().getDownloadUrl();
-        newTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                yourUriVariable= uri;
-            }
-        });*/
 
-        new RetrivePdfStream().execute("http://www.africau.edu/images/default/sample.pdf");
+        resultado = getIntent().getStringExtra(EXTRA_PDF);
 
-    }
-
-    private void getUriFromFirebase() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        List<Partitura> listaPartituras;
-        listaPartituras = new ArrayList<>();
-        List<String> listaUri;
-        listaUri=new ArrayList<>();
-        db.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Partitura partitura = document.toObject(Partitura.class);
-                            listaPartituras.add(partitura);
-                            //Obtenemos el nombre para añadirlo al spinner
-                            listaUri.add(partitura.getPdf());
-                        }
-                    } else {
-                        //Log.d(TAG, "Error getting documents: ", task.getException());
-                    }
-                });
+        new RetrivePdfStream().execute(resultado);
     }
 
     class RetrivePdfStream extends AsyncTask<String,Void, InputStream> {

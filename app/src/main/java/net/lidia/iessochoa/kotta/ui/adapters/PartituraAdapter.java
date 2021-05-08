@@ -39,8 +39,6 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
     private final Context mContext;
     private OnItemClickDownloadListener listenerDownload;
 
-    private StorageReference mStorageReference;
-
     private OnItemClickElementoListener listener;
 
     public PartituraAdapter(@NonNull FirestoreRecyclerOptions options, Context mContext) {
@@ -98,29 +96,13 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             ivDownload.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listenerDownload != null) {
-
-                        listenerDownload.onItemClickDownload(getSnapshots().getSnapshot(position),position);
-
+                    listenerDownload.onItemClickDownload(getSnapshots().getSnapshot(position),position);
                 }
-                    partitura.getPdf();
-
-                mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        // Got the download URL for 'users/me/profile.png'
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                    }
-                });
             });
         }
         public Partitura getPartitura() { return partitura; }
 
         public void bind(Partitura partitura) {
-//          Glide.with(itemView.getContext()).load(partitura.getPdf()).into(image);
             tvNameCv.setText(partitura.getName());
             tvInstrument.setText(partitura.getInstrument());
             tvAuthor.setText(partitura.getAuthor());

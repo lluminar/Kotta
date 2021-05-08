@@ -1,10 +1,13 @@
 package net.lidia.iessochoa.kotta.ui.home;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +39,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
 import net.lidia.iessochoa.kotta.model.PartituraDao;
 import net.lidia.iessochoa.kotta.model.PartituraDaoImpl;
@@ -45,6 +49,8 @@ import net.lidia.iessochoa.kotta.ui.PDFReader;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -52,6 +58,8 @@ import static android.app.Activity.RESULT_CANCELED;
 import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
 
 public class HomeFragment extends Fragment {
+
+    public final static String EXTRA_PDF = "partituraPdf";
 
     private String result;
     private PartituraAdapter adapter;
@@ -71,7 +79,6 @@ public class HomeFragment extends Fragment {
         fabAdd = root.findViewById(R.id.fabAdd);
         partituraDaoImpl = new PartituraDaoImpl();
         rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
-
         return root;
     }
 
@@ -96,32 +103,45 @@ public class HomeFragment extends Fragment {
             Partitura partitura = snapshot.toObject(Partitura.class);
             String id = snapshot.getId();
             Intent intent = new Intent(getActivity(), PDFReader.class);
-            intent.putExtra("partitura",partitura.getPdf());
+            intent.putExtra(EXTRA_PDF,partitura.getPdf());
             startActivity(intent);
+
+            FirebaseStorage storageRef =FirebaseStorage.getInstance();
+            StorageReference pathReference = storageRef.getReference()
+                    .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
+
+            pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                Intent intent1 = new Intent(getActivity(), PDFReader.class);
+                intent1.putExtra(EXTRA_PDF,uri.toString());
+                startActivity(intent1);
+            }).addOnFailureListener(exception -> {
+                // Handle any errors
+            });
         });
 
         adapter.setListenerDownload((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
-            URL url = null;
-            try {
-                url = new URL(partitura.getPdf());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            FirebaseStorage fs =FirebaseStorage.getInstance();
-            StorageReference sr = fs.getReference().child("uploads/");
-            sr.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
+            FirebaseStorage storageRef =FirebaseStorage.getInstance();
+            StorageReference pathReference = storageRef.getReference()
+                    .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
 
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
+                pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                    downloadPDF(partitura.getName(),".pdf",Environment.getExternalStorageDirectory().getPath(),uri.toString());
+                }).addOnFailureListener(exception -> {
                     // Handle any errors
-                }
-            });
+                });
+
         });
+    }
+
+    public void downloadPDF(String fileName, String fileExtension, String destinationDirectory, String url) {
+        DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(getContext(), destinationDirectory,fileName+fileExtension);
+        downloadManager.enqueue(request);
     }
 
     private void createAdapter() {

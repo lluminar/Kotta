@@ -124,7 +124,6 @@ public class AddActivity extends AppCompatActivity {
     private void uploadFile(Uri data) {
         progressBar.setVisibility(View.VISIBLE);
         StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + System.currentTimeMillis() + ".pdf");
-        String url = sRef.getDownloadUrl().toString();
         sRef.putFile(data)
                 .addOnSuccessListener(taskSnapshot -> {
                     progressBar.setVisibility(View.GONE);
@@ -134,7 +133,7 @@ public class AddActivity extends AppCompatActivity {
                         etInstrument.getText().toString(),
                         etAuthor.getText().toString(),
                         actvCategoria.getText().toString(),
-                        taskSnapshot.getMetadata().getReference().getDownloadUrl().toString()
+                        taskSnapshot.getMetadata().getReference().getName()
                     );
                     mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document().set(partitura);
                     ocultarTeclado();
