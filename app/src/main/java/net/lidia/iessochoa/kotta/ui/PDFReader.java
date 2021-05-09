@@ -1,41 +1,27 @@
 package net.lidia.iessochoa.kotta.ui;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 
 import com.github.barteksc.pdfviewer.PDFView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import net.lidia.iessochoa.kotta.R;
-import net.lidia.iessochoa.kotta.model.FirebaseContract;
-import net.lidia.iessochoa.kotta.model.Partitura;
-import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executor;
-
-import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
 import static net.lidia.iessochoa.kotta.ui.home.HomeFragment.EXTRA_PDF;
 
 public class PDFReader extends AppCompatActivity {
@@ -43,6 +29,7 @@ public class PDFReader extends AppCompatActivity {
     private TextView tvView;
     private PDFView pdfView;
     String resultado;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +37,41 @@ public class PDFReader extends AppCompatActivity {
         setContentView(R.layout.activity_pdf_reader);
         tvView = findViewById(R.id.tvViewer);
         pdfView = findViewById(R.id.pdfViewer);
-
-
-        resultado = getIntent().getStringExtra(EXTRA_PDF);
-
+        toolbar = findViewById(R.id.toolbarPdf);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent intent = new Intent(this, PrincipalActivity.class);
+            startActivity(intent);
+        });
+        if (isConnected()) {
+            resultado = getIntent().getStringExtra(EXTRA_PDF);
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("NoInternet Connection Alert")
+                    .setMessage("Go to Setting ?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", (dialog, which) -> startActivity(
+                            new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS)))
+                    .setNegativeButton("No", (dialog, which) -> {
+                    });
+            //Creating dialog box
+            AlertDialog dialog  = builder.create();
+            dialog.show();
+        }
         new RetrivePdfStream().execute(resultado);
+    }
+
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
     }
 
     class RetrivePdfStream extends AsyncTask<String,Void, InputStream> {

@@ -6,10 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".ui.PDFReader">
 
-    <com.github.barteksc.pdfviewer.PDFView
-        android:layout_height="match_parent"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarPdf"
         android:layout_width="match_parent"
-        android:id="@+id/pdfViewer">
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_baseline_close_24"
+        tools:ignore="MissingConstraints" />
+
+    <com.github.barteksc.pdfviewer.PDFView
+        android:id="@+id/pdfViewer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarPdf">
 
         <TextView
             android:id="@+id/tvViewer"
