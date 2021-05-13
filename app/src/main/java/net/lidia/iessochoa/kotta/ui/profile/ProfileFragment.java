@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,9 +17,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.firestore.ChangeEventListener;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -36,9 +40,21 @@ public class ProfileFragment extends Fragment {
     private PartituraDao partituraDaoImpl;
     private RecyclerView rvPartituras;
 
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+
+    private ImageView ivAuthorGoogle;
+    private TextView tvName;
+    private TextView tvEmail;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        ivAuthorGoogle = root.findViewById(R.id.ivUser);
+        tvEmail = root.findViewById(R.id.tvEmail);
+        tvName = root.findViewById(R.id.tvName);
         partituraDaoImpl= new PartituraDaoImpl();
         rvPartituras = root.findViewById(R.id.rvPartituras);
         rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -48,6 +64,11 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        tvName.setText(currentUser.getDisplayName());
+        tvEmail.setText(currentUser.getEmail());
+        if (currentUser.getPhotoUrl() != null)
+            Glide.with(this).load(currentUser.getPhotoUrl()).into(ivAuthorGoogle);
+
         createAdapter();
     }
 
