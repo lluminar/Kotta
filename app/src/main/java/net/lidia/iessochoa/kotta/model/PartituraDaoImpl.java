@@ -43,4 +43,15 @@ public class PartituraDaoImpl implements PartituraDao {
                 .orderBy(FirebaseContract.PartituraEntry.DATE, Query.Direction.DESCENDING);
         return query;
     }
+
+    @Override
+    public Query searchByName(String name) {
+        Query query = FirebaseFirestore.getInstance()
+                //coleccion conferencias
+                .collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS)
+                .whereEqualTo(FirebaseContract.PartituraEntry.NAME, name)
+                //obtenemos la lista ordenada por fecha
+                .orderBy(FirebaseContract.PartituraEntry.DATE, Query.Direction.DESCENDING);
+        return query;
+    }
 }

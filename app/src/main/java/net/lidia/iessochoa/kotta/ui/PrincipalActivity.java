@@ -1,5 +1,7 @@
 package net.lidia.iessochoa.kotta.ui;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -7,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 
 public class PrincipalActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
@@ -39,7 +43,7 @@ public class PrincipalActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
 
     private AppBarConfiguration mAppBarConfiguration;
-
+    private String prueba;
     private ImageView ivAuthorGoogle;
     private TextView tvName;
     private TextView tvEmail;
@@ -107,6 +111,25 @@ public class PrincipalActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.principal, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                prueba = query;
+                HomeFragment home = new HomeFragment();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                //loadHistory(query);
+
+                return true;
+            }
+        });
         return true;
     }
 

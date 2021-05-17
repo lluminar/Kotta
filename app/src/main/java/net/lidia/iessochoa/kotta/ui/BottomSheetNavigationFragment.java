@@ -12,6 +12,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -73,9 +76,20 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navRock:
+                    String datos= "Rock";
                     Bundle bundle = new Bundle();
-                    bundle.putString(EXTRA_DATOS_RESULTADO, "Rock");
-                    this.setArguments(bundle);
+                    bundle.putString(EXTRA_DATOS_RESULTADO, datos);
+
+                    Fragment fragment = new HomeFragment();
+                    fragment.setArguments(bundle);
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.nav_home, fragment);
+                    fragmentTransaction.addToBackStack(null);
+                    // Terminar transición y nos vemos en el fragmento de destino
+                    fragmentTransaction.commit();
+                    dismiss();
+
                     break;
                 case R.id.navPop:
                     dismiss();

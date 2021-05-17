@@ -61,7 +61,6 @@ public class PDFReader extends AppCompatActivity {
         new RetrivePdfStream().execute(resultado);
     }
 
-
     public boolean isConnected() {
         boolean connected = false;
         try {

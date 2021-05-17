@@ -1,40 +1,38 @@
 package net.lidia.iessochoa.kotta.ui.home;
 
-import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.common.ChangeEventType;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.firestore.ChangeEventListener;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -48,13 +46,7 @@ import net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment;
 import net.lidia.iessochoa.kotta.ui.PDFReader;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static android.app.Activity.RESULT_CANCELED;
+import static android.content.Context.SEARCH_SERVICE;
 import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
 
 public class HomeFragment extends Fragment {
@@ -66,6 +58,9 @@ public class HomeFragment extends Fragment {
     private AppCompatActivity activity;
     private RecyclerView rvPartituras;
     private PartituraDao partituraDaoImpl;
+    private Query query;
+    FirestoreRecyclerOptions<Partitura> options;
+
 
     private BottomAppBar bottomAppBar;
     private FloatingActionButton fabAdd;
@@ -97,7 +92,51 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        createAdapter();
+        Bundle datosRecuperados = getArguments();
+        if (datosRecuperados != null) {
+            System.out.println(datosRecuperados);
+            result = datosRecuperados.getString(EXTRA_DATOS_RESULTADO);
+            System.out.println("resultado:" + result);
+        }
+
+        query = partituraDaoImpl.AllPartituras();
+        createAdapter(query);
+
+        if (result != null) {
+            switch (result) {
+                case "Rock":
+                    adapter=null;
+                    query = partituraDaoImpl.getByCategory("Rock");
+
+                    createAdapter(query);
+
+                  /*  options = new FirestoreRecyclerOptions.Builder<Partitura>()
+                            //consulta y clase en la que se guarda los datos
+                            .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
+                    adapter.updateOptions(options);*/
+                    /*adapter.notifyDataSetChanged();
+                    rvPartituras.setAdapter(adapter);*/
+
+                    break;
+                case "Pop":
+                    query = partituraDaoImpl.getByCategory("Pop");
+                    break;
+                case "Clásica":
+                    query = partituraDaoImpl.getByCategory("Clásica");
+                    break;
+                case "Videojuegos":
+                    query = partituraDaoImpl.getByCategory("Videojuegos");
+                    break;
+                case "Película":
+                    query = partituraDaoImpl.getByCategory("Película");
+                    break;
+                case "Baladas":
+                    query = partituraDaoImpl.getByCategory("Baladas");
+                    break;
+                default:
+
+            }
+        }
 
         adapter.setOnCLickElementoListener((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
@@ -130,7 +169,6 @@ public class HomeFragment extends Fragment {
                 }).addOnFailureListener(exception -> {
                     // Handle any errors
                 });
-
         });
     }
 
@@ -144,49 +182,33 @@ public class HomeFragment extends Fragment {
         downloadManager.enqueue(request);
     }
 
-    private void createAdapter() {
-        Query query = partituraDaoImpl.AllPartituras();
-        if (result!=null) {
-            switch (result) {
-                case "Rock":
-                    query = partituraDaoImpl.getByCategory("Rock");
-                    break;
-                case "Pop":
-                    query = partituraDaoImpl.getByCategory("Pop");
-                    break;
-                case "3":
-                    query = partituraDaoImpl.getByCategory("Clásica");
-                    break;
-                case "fre":
-                    query = partituraDaoImpl.getByCategory("Videojuegos");
-                    break;
-                case "5":
-                    query = partituraDaoImpl.getByCategory("Película");
-                    break;
-                case "6":
-                    query = partituraDaoImpl.getByCategory("Baladas");
-                    break;
-            }
-        }
+    public void createAdapter(Query query) {
+        System.out.println(result);
+
         FirestoreRecyclerOptions<Partitura> options = new FirestoreRecyclerOptions.Builder<Partitura>()
                 //consulta y clase en la que se guarda los datos
                 .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
         //si el usuario ya habia seleccionado otra conferencia, paramos las escucha
         if (adapter != null) adapter.stopListening();
         //Creamos el adaptador
+        System.out.println("Creamos adaptador");
         adapter = new PartituraAdapter(options, getContext());
+
+        System.out.println("adaptador creado");
+        adapter.notifyDataSetChanged();
+
         //asignamos el adaptador
         rvPartituras.setAdapter(adapter);
-        //comenzamos a escuchar. Normalmente solo tenemos un adaptador, esto tenemos que
-        // hacerlo en el evento onStar, como indica la documentación
-        adapter.startListening();
+        System.out.println("Envia adapter");
         //Podemos reaccionar ante cambios en la query(se añade un mensaje).
+        adapter.startListening();
         // Nosotros, lo que necesitamos es mover el scroll del recyclerView al inicio para ver el mensaje nuevo
         adapter.getSnapshots().addChangeEventListener(new ChangeEventListener() {
             @Override
             public void onChildChanged(@NonNull ChangeEventType type, @NonNull
                     DocumentSnapshot snapshot, int newIndex, int oldIndex) {
                 rvPartituras.smoothScrollToPosition(0);
+                rvPartituras.setAdapter(adapter);
             }
 
             @Override
@@ -224,17 +246,5 @@ public class HomeFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         inflater.inflate(R.menu.bottom_app_bar, menu);
         super.onCreateOptionsMenu(menu,inflater);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode != RESULT_CANCELED) {
-            // De lo contrario, recogemos el resultado de la segunda actividad.
-            Bundle bundle = getArguments();
-            if (bundle != null)
-                result = bundle.getString(EXTRA_DATOS_RESULTADO);
-        }
     }
 }
