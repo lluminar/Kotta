@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
 
     android:layout_height="wrap_content"
-    card_view:cardBackgroundColor="@color/back"
+    card_view:cardBackgroundColor="@color/black"
     card_view:cardCornerRadius="16dp"
     card_view:cardElevation="4dp"
     card_view:cardUseCompatPadding="true"
@@ -25,9 +25,12 @@
             android:layout_marginStart="24dp"
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal|bold|italic"
             android:maxLines="1"
             android:singleLine="false"
             android:text="TextView"
+            android:textColor="#FFFFFF"
             android:textSize="24sp"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintHorizontal_bias="0.0"
@@ -45,6 +48,7 @@
             android:maxLines="1"
             android:singleLine="false"
             android:text="TextView"
+            android:textColor="#FFFFFF"
             android:textSize="18sp"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintHorizontal_bias="0.0"
@@ -57,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:text="TextView"
+            android:textColor="#FFFFFF"
             card_view:layout_constraintBottom_toBottomOf="@+id/ivCategoryCv"
             card_view:layout_constraintStart_toEndOf="@+id/ivCategoryCv" />
 
@@ -72,22 +77,13 @@
             card_view:layout_constraintTop_toTopOf="parent"
             card_view:srcCompat="@drawable/ic_games" />
 
-        <TextView
-            android:id="@+id/tvSizeCv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="TextView"
-            card_view:layout_constraintBottom_toBottomOf="@+id/tvAuthorCv"
-            card_view:layout_constraintStart_toEndOf="@+id/tvAuthorCv"
-            card_view:layout_constraintTop_toTopOf="@+id/tvAuthorCv" />
-
         <ImageView
             android:id="@+id/ivDownload"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginEnd="16dp"
-            card_view:layout_constraintBottom_toBottomOf="@+id/tvSizeCv"
+            android:layout_marginBottom="8dp"
+            card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:srcCompat="@drawable/ic_baseline_file_download_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>

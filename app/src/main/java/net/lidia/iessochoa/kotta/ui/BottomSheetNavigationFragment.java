@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.ui.home.Filters;
 import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 
 /**
@@ -30,9 +31,8 @@ import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
  * </pre>
  */
 public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
-
-    int result;
     public final static String EXTRA_DATOS_RESULTADO = "datos";
+    String datos;
 
     private static final String ARG_ITEM_COUNT = "item_count";
 
@@ -76,38 +76,46 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navRock:
-                    String datos= "Rock";
-                    Bundle bundle = new Bundle();
-                    bundle.putString(EXTRA_DATOS_RESULTADO, datos);
-
-                    Fragment fragment = new HomeFragment();
-                    fragment.setArguments(bundle);
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.nav_home, fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    // Terminar transición y nos vemos en el fragmento de destino
-                    fragmentTransaction.commit();
+                    String datos= getString(R.string.Rock);
+                    Intent intent = new Intent(getActivity(), Filters.class);
+                    intent.putExtra(EXTRA_DATOS_RESULTADO, datos);
+                    startActivity(intent);
                     dismiss();
-
                     break;
                 case R.id.navPop:
+                    datos= getString(R.string.Pop);
+                    intent = new Intent(getActivity(), Filters.class);
+                    intent.putExtra(EXTRA_DATOS_RESULTADO, datos);
+                    startActivity(intent);
                     dismiss();
-
                     break;
                 case R.id.navClassic:
+                    datos= getString(R.string.Clasica);
+                    intent = new Intent(getActivity(), Filters.class);
+                    intent.putExtra(EXTRA_DATOS_RESULTADO, datos);
+                    startActivity(intent);
                     dismiss();
 
                     break;
                 case R.id.navVideoGames:
+                    datos= getString(R.string.Videojuegos);
+                    intent = new Intent(getActivity(), Filters.class);
+                    intent.putExtra(EXTRA_DATOS_RESULTADO, datos);
+                    startActivity(intent);
                     dismiss();
-
                     break;
                 case R.id.navFilm:
+                    datos= getString(R.string.Peliculas);
+                    intent = new Intent(getActivity(), Filters.class);
+                    intent.putExtra(EXTRA_DATOS_RESULTADO, datos);
+                    startActivity(intent);
                     dismiss();
-
                     break;
                 case R.id.navBalads:
+                    datos= getString(R.string.Baladas);
+                    intent = new Intent(getActivity(), Filters.class);
+                    intent.putExtra(EXTRA_DATOS_RESULTADO, datos);
+                    startActivity(intent);
                     dismiss();
 
                     break;
@@ -115,6 +123,7 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
             }
             return false;
         });
+
         closeButton = contentView.findViewById(R.id.close_image_view);
         closeButton.setOnClickListener(view -> {
             //dismiss bottom sheet

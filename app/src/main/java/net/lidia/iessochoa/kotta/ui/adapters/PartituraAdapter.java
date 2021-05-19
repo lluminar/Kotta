@@ -83,7 +83,6 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             tvInstrument = itemView.findViewById(R.id.tvInstrumentCv);
             tvAuthor = itemView.findViewById(R.id.tvAuthorCv);
             ivDownload = itemView.findViewById(R.id.ivDownload);
-            tvSize = itemView.findViewById(R.id.tvSizeCv);
             itemPartitura = itemView.findViewById(R.id.cvItem);
 
             itemPartitura.setOnClickListener(v -> {

@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/audio_wave1600c"
         android:supportsRtl="true"
         android:theme="@style/Theme.Kotta">
-        <activity android:name=".ui.SplashScreen"
+        <activity
+            android:name=".ui.SplashScreen"
             android:theme="@style/Theme.Kotta.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,13 +38,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.PrincipalActivity" />
         </activity>
+        <activity android:name=".ui.home.Filters"
+            android:theme="@style/Theme.Kotta.NoActionBar">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".ui.PrincipalActivity" />
+        </activity>
+
         <activity
             android:name=".ui.PrincipalActivity"
             android:label="@string/title_activity_principal"
             android:theme="@style/Theme.Kotta.NoActionBar" />
-        <activity android:name=".ui.MainActivity">
-
-        </activity>
+        <activity android:name=".ui.MainActivity"></activity>
     </application>
 
 </manifest>

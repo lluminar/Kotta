@@ -59,8 +59,6 @@ public class HomeFragment extends Fragment {
     private RecyclerView rvPartituras;
     private PartituraDao partituraDaoImpl;
     private Query query;
-    FirestoreRecyclerOptions<Partitura> options;
-
 
     private BottomAppBar bottomAppBar;
     private FloatingActionButton fabAdd;
@@ -92,51 +90,10 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        Bundle datosRecuperados = getArguments();
-        if (datosRecuperados != null) {
-            System.out.println(datosRecuperados);
-            result = datosRecuperados.getString(EXTRA_DATOS_RESULTADO);
-            System.out.println("resultado:" + result);
-        }
-
         query = partituraDaoImpl.AllPartituras();
         createAdapter(query);
 
-        if (result != null) {
-            switch (result) {
-                case "Rock":
-                    adapter=null;
-                    query = partituraDaoImpl.getByCategory("Rock");
 
-                    createAdapter(query);
-
-                  /*  options = new FirestoreRecyclerOptions.Builder<Partitura>()
-                            //consulta y clase en la que se guarda los datos
-                            .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
-                    adapter.updateOptions(options);*/
-                    /*adapter.notifyDataSetChanged();
-                    rvPartituras.setAdapter(adapter);*/
-
-                    break;
-                case "Pop":
-                    query = partituraDaoImpl.getByCategory("Pop");
-                    break;
-                case "Clásica":
-                    query = partituraDaoImpl.getByCategory("Clásica");
-                    break;
-                case "Videojuegos":
-                    query = partituraDaoImpl.getByCategory("Videojuegos");
-                    break;
-                case "Película":
-                    query = partituraDaoImpl.getByCategory("Película");
-                    break;
-                case "Baladas":
-                    query = partituraDaoImpl.getByCategory("Baladas");
-                    break;
-                default:
-
-            }
-        }
 
         adapter.setOnCLickElementoListener((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
@@ -200,7 +157,7 @@ public class HomeFragment extends Fragment {
         //asignamos el adaptador
         rvPartituras.setAdapter(adapter);
         System.out.println("Envia adapter");
-        //Podemos reaccionar ante cambios en la query(se añade un mensaje).
+        //Podemos reaccionar ante cambios en la query.
         adapter.startListening();
         // Nosotros, lo que necesitamos es mover el scroll del recyclerView al inicio para ver el mensaje nuevo
         adapter.getSnapshots().addChangeEventListener(new ChangeEventListener() {
@@ -213,6 +170,8 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onDataChanged() {
+                rvPartituras.smoothScrollToPosition(0);
+                rvPartituras.setAdapter(adapter);
             }
 
             @Override
