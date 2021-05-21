@@ -32,7 +32,6 @@ import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
  */
 public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
     public final static String EXTRA_DATOS_RESULTADO = "datos";
-    String datos;
 
     private static final String ARG_ITEM_COUNT = "item_count";
 
@@ -117,9 +116,7 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
                     intent.putExtra(EXTRA_DATOS_RESULTADO, datos);
                     startActivity(intent);
                     dismiss();
-
                     break;
-                default:
             }
             return false;
         });

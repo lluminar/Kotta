@@ -137,7 +137,7 @@ public class AddActivity extends AppCompatActivity {
                     );
                     mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document().set(partitura);
                     ocultarTeclado();
-                    Toast.makeText(this, "File Uploaded Successfully",Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Partitura subida con éxito",Toast.LENGTH_LONG).show();
 
                 })
                 .addOnFailureListener(exception -> Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show())

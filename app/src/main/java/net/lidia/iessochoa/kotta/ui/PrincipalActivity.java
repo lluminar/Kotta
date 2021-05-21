@@ -34,7 +34,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.ui.home.Filters;
 import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
+
+import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
 
 public class PrincipalActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
@@ -43,7 +46,6 @@ public class PrincipalActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
 
     private AppBarConfiguration mAppBarConfiguration;
-    private String prueba;
     private ImageView ivAuthorGoogle;
     private TextView tvName;
     private TextView tvEmail;
@@ -114,12 +116,13 @@ public class PrincipalActivity extends AppCompatActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        Intent intent = new Intent(this, Filters.class);
 
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                prueba = query;
-                HomeFragment home = new HomeFragment();
+                intent.putExtra(EXTRA_DATOS_RESULTADO, query);
+                startActivity(intent);
                 return false;
             }
 

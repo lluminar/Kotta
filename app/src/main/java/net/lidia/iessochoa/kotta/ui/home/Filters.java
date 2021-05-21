@@ -52,9 +52,9 @@ public class Filters extends AppCompatActivity {
             Intent intent = new Intent(this, PrincipalActivity.class);
             startActivity(intent);
         });
+
         Bundle datosRecuperados = this.getIntent().getExtras();
         if (datosRecuperados != null) {
-            System.out.println(datosRecuperados);
             result = datosRecuperados.getString(EXTRA_DATOS_RESULTADO);
             System.out.println("resultado:" + result);
         }
@@ -80,7 +80,7 @@ public class Filters extends AppCompatActivity {
                     query = partituraDaoImpl.getByCategory(getString(R.string.Baladas));
                     break;
                 default:
-
+                    query = partituraDaoImpl.searchByName(result);
             }
         }
         createAdapter(query);

@@ -13,13 +13,13 @@
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
+        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
         app:hideOnScroll="true"
-        app:navigationIcon="@drawable/ic_desplegable"
-        app:menu="@menu/bottom_app_bar" />
+        app:menu="@menu/bottom_app_bar"
+        app:navigationIcon="@drawable/ic_desplegable" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"

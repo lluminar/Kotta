@@ -4,6 +4,8 @@ import android.app.DownloadManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,7 +55,7 @@ public class HomeFragment extends Fragment {
 
     public final static String EXTRA_PDF = "partituraPdf";
 
-    private String result;
+    private boolean sentido = true;
     private PartituraAdapter adapter;
     private AppCompatActivity activity;
     private RecyclerView rvPartituras;
@@ -69,6 +71,7 @@ public class HomeFragment extends Fragment {
 
         rvPartituras = root.findViewById(R.id.rvPartituras);
         bottomAppBar = root.findViewById(R.id.bottomAppBar);
+
         fabAdd = root.findViewById(R.id.fabAdd);
         partituraDaoImpl = new PartituraDaoImpl();
         rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -78,7 +81,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-       // homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        // homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         //Handle navigation icon press
         bottomAppBar.setNavigationOnClickListener(v -> {
             BottomSheetDialogFragment bottomSheetDialogFragment = BottomSheetNavigationFragment.newInstance();
@@ -93,22 +96,19 @@ public class HomeFragment extends Fragment {
         query = partituraDaoImpl.AllPartituras();
         createAdapter(query);
 
-
-
         adapter.setOnCLickElementoListener((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
-            String id = snapshot.getId();
             Intent intent = new Intent(getActivity(), PDFReader.class);
-            intent.putExtra(EXTRA_PDF,partitura.getPdf());
+            intent.putExtra(EXTRA_PDF, partitura.getPdf());
             startActivity(intent);
 
-            FirebaseStorage storageRef =FirebaseStorage.getInstance();
+            FirebaseStorage storageRef = FirebaseStorage.getInstance();
             StorageReference pathReference = storageRef.getReference()
                     .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
 
             pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
                 Intent intent1 = new Intent(getActivity(), PDFReader.class);
-                intent1.putExtra(EXTRA_PDF,uri.toString());
+                intent1.putExtra(EXTRA_PDF, uri.toString());
                 startActivity(intent1);
             }).addOnFailureListener(exception -> {
                 // Handle any errors
@@ -117,15 +117,15 @@ public class HomeFragment extends Fragment {
 
         adapter.setListenerDownload((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
-            FirebaseStorage storageRef =FirebaseStorage.getInstance();
+            FirebaseStorage storageRef = FirebaseStorage.getInstance();
             StorageReference pathReference = storageRef.getReference()
                     .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
 
-                pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                    downloadPDF(partitura.getName(),".pdf",Environment.getExternalStorageDirectory().getPath(),uri.toString());
-                }).addOnFailureListener(exception -> {
-                    // Handle any errors
-                });
+            pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                downloadPDF(partitura.getName(), ".pdf", Environment.getExternalStorageDirectory().getPath(), uri.toString());
+            }).addOnFailureListener(exception -> {
+                // Handle any errors
+            });
         });
     }
 
@@ -135,13 +135,11 @@ public class HomeFragment extends Fragment {
         DownloadManager.Request request = new DownloadManager.Request(uri);
 
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalFilesDir(getContext(), destinationDirectory,fileName+fileExtension);
+        request.setDestinationInExternalFilesDir(getContext(), destinationDirectory, fileName + fileExtension);
         downloadManager.enqueue(request);
     }
 
     public void createAdapter(Query query) {
-        System.out.println(result);
-
         FirestoreRecyclerOptions<Partitura> options = new FirestoreRecyclerOptions.Builder<Partitura>()
                 //consulta y clase en la que se guarda los datos
                 .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
@@ -202,8 +200,31 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.bottom_app_bar, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.ordenar: // Al dar en sentido, cambiar sentido.
+
+                if (sentido)
+                    item.setIcon(R.drawable.avd_anim_up_down);
+                else
+                    item.setIcon(R.drawable.avd_anim_down_up);
+
+                Drawable icon = item.getIcon();
+                sentido = !sentido;
+
+                if (icon.getClass() == AnimatedVectorDrawable.class)
+                    ((AnimatedVectorDrawable) icon).start();
+
+                return true;
+            default: return false;
+        }
     }
 }

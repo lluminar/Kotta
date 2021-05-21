@@ -27,6 +27,7 @@
     <string name="Aviso">Aviso</string>
     <string name="vacio">Es necesario rellenar todos los campos</string>
     <string name="pdfNull">Se debe añadir la partitura</string>
+    <string name="avisoBorrar">¿Está seguro que desea eliminar la partitura? </string>
 
     <string name="Rock">Rock</string>
     <string name="Pop">Pop</string>

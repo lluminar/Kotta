@@ -4,9 +4,8 @@
 
     <item
         android:id="@+id/ordenar"
-        android:icon="@drawable/ic_user_24px"
+        android:icon="@drawable/avd_anim_up_down"
         android:title="@string/search"
-        app:showAsAction="ifRoom" />
-
-
+        android:orderInCategory="2"
+        app:showAsAction="always" />
 </menu>

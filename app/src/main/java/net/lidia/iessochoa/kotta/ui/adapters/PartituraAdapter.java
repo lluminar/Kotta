@@ -38,8 +38,8 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
 
     private final Context mContext;
     private OnItemClickDownloadListener listenerDownload;
-
     private OnItemClickElementoListener listener;
+    private OnItemClickOptions listenerOptions;
 
     public PartituraAdapter(@NonNull FirestoreRecyclerOptions options, Context mContext) {
         super(options);
@@ -57,6 +57,9 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
     @Override
     protected void onBindViewHolder(@NonNull PartituraViewHolder holder, int position, @NonNull Partitura model) {
         holder.bind(model);
+        FirebaseUser user  = FirebaseAuth.getInstance().getCurrentUser();
+        if (model.getUser().equals(user.getEmail())) holder.ivOptions.setVisibility(View.VISIBLE);
+        else holder.ivOptions.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -70,8 +73,12 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
         this.listenerDownload = listenerDownload;
     }
 
+    public void setListenerOptions(OnItemClickOptions listenerOptions) {
+        this.listenerOptions = listenerOptions;
+    }
+
     public class PartituraViewHolder extends RecyclerView.ViewHolder {
-        private ImageView ivCategory, ivDownload;
+        private ImageView ivCategory, ivDownload, ivOptions;
         private TextView tvNameCv, tvInstrument, tvAuthor, tvSize;
         private Partitura partitura;
         private CardView itemPartitura;
@@ -83,6 +90,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             tvInstrument = itemView.findViewById(R.id.tvInstrumentCv);
             tvAuthor = itemView.findViewById(R.id.tvAuthorCv);
             ivDownload = itemView.findViewById(R.id.ivDownload);
+            ivOptions = itemView.findViewById(R.id.ivOptions);
             itemPartitura = itemView.findViewById(R.id.cvItem);
 
             itemPartitura.setOnClickListener(v -> {
@@ -97,6 +105,12 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
                 if (position != RecyclerView.NO_POSITION && listenerDownload != null) {
                     listenerDownload.onItemClickDownload(getSnapshots().getSnapshot(position),position);
                 }
+            });
+
+            ivOptions.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && listener != null)
+                    listenerOptions.onItemClickOptions(getSnapshots().getSnapshot(position),position);
             });
         }
         public Partitura getPartitura() { return partitura; }
@@ -143,7 +157,13 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
         this.listener = listener;
     }
 
+
+
     public interface OnItemClickDownloadListener {
         void onItemClickDownload(DocumentSnapshot snapshot, int position);
+    }
+
+    public interface  OnItemClickOptions {
+        void onItemClickOptions(DocumentSnapshot snapshot, int position);
     }
 }

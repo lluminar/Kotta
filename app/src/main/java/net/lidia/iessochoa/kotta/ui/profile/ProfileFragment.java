@@ -1,15 +1,19 @@
 package net.lidia.iessochoa.kotta.ui.profile;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -24,14 +28,24 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import net.lidia.iessochoa.kotta.R;
+import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
 import net.lidia.iessochoa.kotta.model.PartituraDao;
 import net.lidia.iessochoa.kotta.model.PartituraDaoImpl;
+import net.lidia.iessochoa.kotta.ui.PDFReader;
+import net.lidia.iessochoa.kotta.ui.PrincipalActivity;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
+import net.lidia.iessochoa.kotta.ui.home.Filters;
+
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+import static net.lidia.iessochoa.kotta.ui.home.HomeFragment.EXTRA_PDF;
 
 public class ProfileFragment extends Fragment {
 
@@ -42,6 +56,8 @@ public class ProfileFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+    private StorageReference mStorageReference;
+    private FirebaseFirestore mDatabaseReference;
 
     private ImageView ivAuthorGoogle;
     private TextView tvName;
@@ -52,6 +68,8 @@ public class ProfileFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        mStorageReference = FirebaseStorage.getInstance().getReference();
+        mDatabaseReference = FirebaseFirestore.getInstance();
         ivAuthorGoogle = root.findViewById(R.id.ivUser);
         tvEmail = root.findViewById(R.id.tvEmail);
         tvName = root.findViewById(R.id.tvName);
@@ -70,6 +88,55 @@ public class ProfileFragment extends Fragment {
             Glide.with(this).load(currentUser.getPhotoUrl()).into(ivAuthorGoogle);
 
         createAdapter();
+
+        adapter.setOnCLickElementoListener((snapshot, position) -> {
+            Partitura partitura = snapshot.toObject(Partitura.class);
+            Intent intent = new Intent(getActivity(), PDFReader.class);
+            intent.putExtra(EXTRA_PDF,partitura.getPdf());
+            startActivity(intent);
+
+            FirebaseStorage storageRef =FirebaseStorage.getInstance();
+            StorageReference pathReference = storageRef.getReference()
+                    .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
+
+            pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                Intent intent1 = new Intent(getActivity(), PDFReader.class);
+                intent1.putExtra(EXTRA_PDF,uri.toString());
+                startActivity(intent1);
+            }).addOnFailureListener(exception -> {
+                // Handle any errors
+            });
+        });
+
+        adapter.setListenerOptions((snapshot, position) -> {
+            Partitura partitura = snapshot.toObject(Partitura.class);
+            deletePartitura(partitura,snapshot.getId());
+        });
+    }
+
+    private void deletePartitura(final Partitura partitura, final  String documentId) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        dialog.setTitle(R.string.Aviso);
+        dialog.setMessage(R.string.avisoBorrar);
+
+        //En caso de que acepte borramos la partitura
+        dialog.setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+            // Qué hacemos en caso ok
+                StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
+                sRef.delete()
+                        .addOnSuccessListener(taskSnapshot -> {
+                            mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document(documentId).delete();
+                            Intent intent = new Intent(getContext(), PrincipalActivity.class);
+                            startActivity(intent);
+                            Toast.makeText(getContext(), "La partitura se ha borrado correctamente",Toast.LENGTH_LONG).show();
+                        })
+                        .addOnFailureListener(exception -> Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show());
+        });
+        //Si cancela no borramos el pokemon
+        dialog.setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
+            // Qué hacemos en caso cancel
+        });
+        dialog.show();
     }
 
     private void createAdapter() {
@@ -103,6 +170,19 @@ public class ProfileFragment extends Fragment {
             public void onError(@NonNull FirebaseFirestoreException e) {
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+        rvPartituras.setAdapter(adapter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 
     @Override
