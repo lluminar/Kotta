@@ -49,7 +49,9 @@
             android:name=".ui.PrincipalActivity"
             android:label="@string/title_activity_principal"
             android:theme="@style/Theme.Kotta.NoActionBar" />
-        <activity android:name=".ui.MainActivity"></activity>
+        <activity android:name=".ui.MainActivity"
+            android:theme="@style/Theme.Kotta.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
