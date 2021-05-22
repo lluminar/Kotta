@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,7 @@ import net.lidia.iessochoa.kotta.ui.PDFReader;
 import net.lidia.iessochoa.kotta.ui.PrincipalActivity;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 import net.lidia.iessochoa.kotta.ui.home.Filters;
+import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 import static net.lidia.iessochoa.kotta.ui.home.HomeFragment.EXTRA_PDF;
@@ -108,13 +110,27 @@ public class ProfileFragment extends Fragment {
             });
         });
 
+        adapter.setListenerDownload((snapshot, position) -> {
+            Partitura partitura = snapshot.toObject(Partitura.class);
+            FirebaseStorage storageRef = FirebaseStorage.getInstance();
+            StorageReference pathReference = storageRef.getReference()
+                    .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
+
+            pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                HomeFragment h = new HomeFragment();
+                h.downloadPDF(partitura.getName(), ".pdf", Environment.getExternalStorageDirectory().getPath(), uri.toString());
+            }).addOnFailureListener(exception -> {
+                // Handle any errors
+            });
+        });
+
         adapter.setListenerOptions((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             deletePartitura(partitura,snapshot.getId());
         });
     }
 
-    private void deletePartitura(final Partitura partitura, final  String documentId) {
+    public void deletePartitura(final Partitura partitura, final  String documentId) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle(R.string.Aviso);
         dialog.setMessage(R.string.avisoBorrar);

@@ -16,9 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
@@ -33,6 +35,7 @@ import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
@@ -46,7 +49,9 @@ import net.lidia.iessochoa.kotta.model.PartituraDaoImpl;
 import net.lidia.iessochoa.kotta.ui.AddActivity;
 import net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment;
 import net.lidia.iessochoa.kotta.ui.PDFReader;
+import net.lidia.iessochoa.kotta.ui.PrincipalActivity;
 import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
+import net.lidia.iessochoa.kotta.ui.profile.ProfileFragment;
 
 import static android.content.Context.SEARCH_SERVICE;
 import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
@@ -55,12 +60,14 @@ public class HomeFragment extends Fragment {
 
     public final static String EXTRA_PDF = "partituraPdf";
 
-    private boolean sentido = true;
     private PartituraAdapter adapter;
     private AppCompatActivity activity;
     private RecyclerView rvPartituras;
     private PartituraDao partituraDaoImpl;
+    private StorageReference mStorageReference;
+    private FirebaseFirestore mDatabaseReference;
     private Query query;
+    private boolean sentido = true;
 
     private BottomAppBar bottomAppBar;
     private FloatingActionButton fabAdd;
@@ -71,7 +78,8 @@ public class HomeFragment extends Fragment {
 
         rvPartituras = root.findViewById(R.id.rvPartituras);
         bottomAppBar = root.findViewById(R.id.bottomAppBar);
-
+        mStorageReference = FirebaseStorage.getInstance().getReference();
+        mDatabaseReference = FirebaseFirestore.getInstance();
         fabAdd = root.findViewById(R.id.fabAdd);
         partituraDaoImpl = new PartituraDaoImpl();
         rvPartituras.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -83,6 +91,7 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         // homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         //Handle navigation icon press
+
         bottomAppBar.setNavigationOnClickListener(v -> {
             BottomSheetDialogFragment bottomSheetDialogFragment = BottomSheetNavigationFragment.newInstance();
             bottomSheetDialogFragment.show(activity.getSupportFragmentManager(), "Bottom Sheet Dialog Fragment");
@@ -127,6 +136,36 @@ public class HomeFragment extends Fragment {
                 // Handle any errors
             });
         });
+
+        adapter.setListenerOptions((snapshot, position) -> {
+            Partitura partitura = snapshot.toObject(Partitura.class);
+            deletePartitura(partitura,snapshot.getId());
+        });
+    }
+
+    public void deletePartitura(final Partitura partitura, final  String documentId) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        dialog.setTitle(R.string.Aviso);
+        dialog.setMessage(R.string.avisoBorrar);
+
+        //En caso de que acepte borramos la partitura
+        dialog.setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+            // Qué hacemos en caso ok
+            StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
+            sRef.delete()
+                    .addOnSuccessListener(taskSnapshot -> {
+                        mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document(documentId).delete();
+                        Intent intent = new Intent(getContext(), PrincipalActivity.class);
+                        startActivity(intent);
+                        Toast.makeText(getContext(), "La partitura se ha borrado correctamente",Toast.LENGTH_LONG).show();
+                    })
+                    .addOnFailureListener(exception -> Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show());
+        });
+        //Si cancela no borramos el pokemon
+        dialog.setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
+            // Qué hacemos en caso cancel
+        });
+        dialog.show();
     }
 
     public void downloadPDF(String fileName, String fileExtension, String destinationDirectory, String url) {
@@ -207,11 +246,8 @@ public class HomeFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         switch (item.getItemId()) {
-
             case R.id.ordenar: // Al dar en sentido, cambiar sentido.
-
                 if (sentido)
                     item.setIcon(R.drawable.avd_anim_up_down);
                 else
@@ -222,7 +258,6 @@ public class HomeFragment extends Fragment {
 
                 if (icon.getClass() == AnimatedVectorDrawable.class)
                     ((AnimatedVectorDrawable) icon).start();
-
                 return true;
             default: return false;
         }
