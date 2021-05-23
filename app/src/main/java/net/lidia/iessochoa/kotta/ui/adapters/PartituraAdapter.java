@@ -156,9 +156,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
     public void setOnItemClickElementoListener(AdapterView.OnItemClickListener onItemClickElementoListener) {
         this.listener = listener;
     }
-
-
-
+    
     public interface OnItemClickDownloadListener {
         void onItemClickDownload(DocumentSnapshot snapshot, int position);
     }

@@ -78,6 +78,7 @@ public class HomeFragment extends Fragment {
 
         rvPartituras = root.findViewById(R.id.rvPartituras);
         bottomAppBar = root.findViewById(R.id.bottomAppBar);
+        setHasOptionsMenu(true);
         mStorageReference = FirebaseStorage.getInstance().getReference();
         mDatabaseReference = FirebaseFirestore.getInstance();
         fabAdd = root.findViewById(R.id.fabAdd);
@@ -89,9 +90,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         //Handle navigation icon press
-
         bottomAppBar.setNavigationOnClickListener(v -> {
             BottomSheetDialogFragment bottomSheetDialogFragment = BottomSheetNavigationFragment.newInstance();
             bottomSheetDialogFragment.show(activity.getSupportFragmentManager(), "Bottom Sheet Dialog Fragment");
@@ -248,11 +247,16 @@ public class HomeFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.ordenar: // Al dar en sentido, cambiar sentido.
-                if (sentido)
+                if (sentido) {
                     item.setIcon(R.drawable.avd_anim_up_down);
-                else
+                    query = partituraDaoImpl.changeOrder();
+                    createAdapter(query);
+                }
+                else {
                     item.setIcon(R.drawable.avd_anim_down_up);
-
+                    query = partituraDaoImpl.AllPartituras();
+                    createAdapter(query);
+                }
                 Drawable icon = item.getIcon();
                 sentido = !sentido;
 

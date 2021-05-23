@@ -1,6 +1,7 @@
 package net.lidia.iessochoa.kotta.ui.home;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,11 +10,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.widget.Toast;
 
 import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.firestore.ChangeEventListener;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
@@ -38,6 +41,8 @@ public class Filters extends AppCompatActivity {
     private Toolbar toolbar;
     private PartituraDao partituraDaoImpl;
     private Query query;
+    private StorageReference mStorageReference;
+    private FirebaseFirestore mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,8 @@ public class Filters extends AppCompatActivity {
         rvPartituras = findViewById(R.id.rvFilters);
         rvPartituras.setLayoutManager(new LinearLayoutManager(this));
         toolbar = findViewById(R.id.toolbarAdd);
+        mStorageReference = FirebaseStorage.getInstance().getReference();
+        mDatabaseReference = FirebaseFirestore.getInstance();
 
         partituraDaoImpl = new PartituraDaoImpl();
         toolbar.setNavigationOnClickListener(v -> {
@@ -117,6 +124,11 @@ public class Filters extends AppCompatActivity {
                 // Handle any errors
             });
         });
+
+        adapter.setListenerOptions((snapshot, position) -> {
+            Partitura partitura = snapshot.toObject(Partitura.class);
+            deletePartitura(partitura,snapshot.getId());
+        });
     }
 
     public void createAdapter(Query query) {
@@ -160,4 +172,28 @@ public class Filters extends AppCompatActivity {
         });
     }
 
+    public void deletePartitura(final Partitura partitura, final  String documentId) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle(R.string.Aviso);
+        dialog.setMessage(R.string.avisoBorrar);
+
+        //En caso de que acepte borramos la partitura
+        dialog.setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+            // Qué hacemos en caso ok
+            StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
+            sRef.delete()
+                    .addOnSuccessListener(taskSnapshot -> {
+                        mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document(documentId).delete();
+                        Intent intent = new Intent(this, PrincipalActivity.class);
+                        startActivity(intent);
+                        Toast.makeText(this, "La partitura se ha borrado correctamente",Toast.LENGTH_LONG).show();
+                    })
+                    .addOnFailureListener(exception -> Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show());
+        });
+        //Si cancela no borramos el pokemon
+        dialog.setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
+            // Qué hacemos en caso cancel
+        });
+        dialog.show();
+    }
 }

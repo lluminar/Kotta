@@ -10,4 +10,5 @@ public interface PartituraDao {
     Query getOwnPartituras();
     Query getByCategory(String category);
     Query searchByName(String name);
+    Query changeOrder();
 }
