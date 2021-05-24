@@ -1,12 +1,17 @@
 package net.lidia.iessochoa.kotta.ui;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -28,6 +34,9 @@ import com.google.firebase.storage.StorageReference;
 import net.lidia.iessochoa.kotta.R;
 import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
+
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class AddActivity extends AppCompatActivity {
     private final int PICK_PDF_FILE = 2;
@@ -39,6 +48,7 @@ public class AddActivity extends AppCompatActivity {
 
     private Partitura partitura;
 
+    private ConstraintLayout clPrincipal;
     private EditText etName;
     private EditText etInstrument;
     private EditText etAuthor;
@@ -69,6 +79,7 @@ public class AddActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvProgress = findViewById(R.id.tvProgress);
         toolbar = findViewById(R.id.toolbarAdd);
+        clPrincipal = findViewById(R.id.clPrincipal);
 
         setSupportActionBar(toolbar);
         categorias = getResources().getStringArray(R.array.category);
@@ -80,7 +91,7 @@ public class AddActivity extends AppCompatActivity {
         actv.setAdapter(adaptador1);
 
         ivPDF.setOnClickListener(v -> {
-            getPDF();
+            if (noNecesarioSolicitarPermisos()) getPDF();
         });
 
         datos = new EditText[] {
@@ -106,17 +117,6 @@ public class AddActivity extends AppCompatActivity {
         return true;
     }
 
-    private void getPDF() {
-        //for greater than lolipop versions we need the permissions asked on runtime
-        //so if the permission is not available user will go to the screen to allow storage permission
-
-        //creating an intent for file chooser
-        Intent intent = new Intent();
-        intent.setType("application/pdf");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select PDF"), PICK_PDF_FILE);
-    }
-
     /**
      * This method is uploading the file
      * @param data
@@ -129,7 +129,7 @@ public class AddActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     partitura = new Partitura(
                         mAuth.getCurrentUser().getEmail(),
-                        etName.getText().toString(),
+                        etName.getText().toString().toUpperCase(),
                         etInstrument.getText().toString(),
                         etAuthor.getText().toString(),
                         actvCategoria.getText().toString(),
@@ -209,6 +209,79 @@ public class AddActivity extends AppCompatActivity {
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(etAuthor.getWindowToken(), 0);
+        }
+    }
+
+    private void getPDF() {
+        //for greater than lolipop versions we need the permissions asked on runtime
+        //so if the permission is not available user will go to the screen to allow storage permission
+
+        //creating an intent for file chooser
+        Intent intent = new Intent();
+        intent.setType("application/pdf");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select PDF"), PICK_PDF_FILE);
+    }
+
+    /**
+     * Comprobamos si los permisos son necesarios
+     * @return
+     */
+    private boolean noNecesarioSolicitarPermisos() {
+        //si la versión es inferior a la 6
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return true;
+        //comprobamos si tenemos los permisos
+        if (checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+            return true;
+        //indicamos al usuario porqué necesitamos los permisos siempre que no haya indicado que no lo volvamos a hacer
+        if (shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE))  {
+            Snackbar.make(clPrincipal, getString(R.string.nesitaPermisos),
+                    Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, v ->
+                    requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS)).show();
+        } else {//pedimos permisos sin indicar el porqué
+            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS);
+        }
+        return false;//necesario pedir permisos
+    }
+
+    /**
+     * Si se deniegan los permisos mostramos las opciones de la aplicación para que el usuario acepte los permisos
+     */
+    private void muestraExplicacionDenegacionPermisos() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.permisos));
+        builder.setMessage(getString(R.string.nesitaPermisos));
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            Intent intent = new Intent();
+
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts(getString(R.string.pacage), getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        });
+        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+            dialog.dismiss();
+            finish();
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[]
+            permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions,
+                grantResults);
+        if (requestCode == MY_PERMISSIONS) {
+            if (grantResults.length == 2 && grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED && grantResults[1] ==
+                    PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this,"tiene permisos", Toast.LENGTH_SHORT).show();
+                getPDF();
+            } else {//si no se aceptan los permisos
+                muestraExplicacionDenegacionPermisos();
+            }
         }
     }
 }

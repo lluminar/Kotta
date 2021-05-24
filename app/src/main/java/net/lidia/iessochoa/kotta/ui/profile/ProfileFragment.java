@@ -128,6 +128,8 @@ public class ProfileFragment extends Fragment {
             Partitura partitura = snapshot.toObject(Partitura.class);
             deletePartitura(partitura,snapshot.getId());
         });
+
+
     }
 
     public void deletePartitura(final Partitura partitura, final  String documentId) {
