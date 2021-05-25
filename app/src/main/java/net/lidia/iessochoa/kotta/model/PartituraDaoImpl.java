@@ -46,6 +46,7 @@ public class PartituraDaoImpl implements PartituraDao {
 
     @Override
     public Query searchByName(String name) {
+        name.toUpperCase();
         Query query = FirebaseFirestore.getInstance()
                 //coleccion conferencias
                 .collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS)
