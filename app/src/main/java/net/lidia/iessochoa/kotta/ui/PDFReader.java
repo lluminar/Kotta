@@ -24,6 +24,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import static net.lidia.iessochoa.kotta.ui.home.HomeFragment.EXTRA_PDF;
 
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class PDFReader extends AppCompatActivity {
 
     private TextView tvView;
@@ -35,20 +38,27 @@ public class PDFReader extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf_reader);
+
         tvView = findViewById(R.id.tvViewer);
         pdfView = findViewById(R.id.pdfViewer);
+        //To return to PrincipalActivity when users click the cross
         toolbar = findViewById(R.id.toolbarPdf);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> {
             Intent intent = new Intent(this, PrincipalActivity.class);
             startActivity(intent);
         });
+
+        /**
+         * Check if there are connection
+         * if there are allow to show the pdf if not we advice user
+         */
         if (isConnected()) {
             resultado = getIntent().getStringExtra(EXTRA_PDF);
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("NoInternet Connection Alert")
-                    .setMessage("Go to Setting ?")
+            builder.setTitle(getResources().getString(R.string.fui_no_internet))
+                    .setMessage("Go to Setting?")
                     .setCancelable(false)
                     .setPositiveButton("Yes", (dialog, which) -> startActivity(
                             new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS)))
@@ -61,6 +71,10 @@ public class PDFReader extends AppCompatActivity {
         new RetrivePdfStream().execute(resultado);
     }
 
+    /**
+     * Method to check if there are connection
+     * @return: if there are or not
+     */
     public boolean isConnected() {
         boolean connected = false;
         try {
@@ -73,6 +87,9 @@ public class PDFReader extends AppCompatActivity {
         return connected;
     }
 
+    /**
+     * Class to create PDFViewer
+     */
     class RetrivePdfStream extends AsyncTask<String,Void, InputStream> {
 
         @Override

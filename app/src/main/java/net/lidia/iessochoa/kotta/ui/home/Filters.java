@@ -7,7 +7,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
@@ -33,7 +36,9 @@ import net.lidia.iessochoa.kotta.ui.adapters.PartituraAdapter;
 
 import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
 import static net.lidia.iessochoa.kotta.ui.home.HomeFragment.EXTRA_PDF;
-
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class Filters extends AppCompatActivity {
     private PartituraAdapter adapter;
     private RecyclerView rvPartituras;
@@ -53,8 +58,8 @@ public class Filters extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbarAdd);
         mStorageReference = FirebaseStorage.getInstance().getReference();
         mDatabaseReference = FirebaseFirestore.getInstance();
-
         partituraDaoImpl = new PartituraDaoImpl();
+        //Go back
         toolbar.setNavigationOnClickListener(v -> {
             Intent intent = new Intent(this, PrincipalActivity.class);
             startActivity(intent);
@@ -66,6 +71,7 @@ public class Filters extends AppCompatActivity {
             System.out.println("resultado:" + result);
         }
 
+        //Choose what query is going to be used
         if (result != null) {
             switch (result) {
                 case "Rock":
@@ -90,8 +96,12 @@ public class Filters extends AppCompatActivity {
                     query = partituraDaoImpl.searchByName(result);
             }
         }
+        //Create adapter with the query
         createAdapter(query);
 
+        /**
+         * When clicks one item open PDFViewer
+         */
         adapter.setOnCLickElementoListener((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             Intent intent = new Intent(this, PDFReader.class);
@@ -111,6 +121,9 @@ public class Filters extends AppCompatActivity {
             });
         });
 
+        /**
+         * When clicks download image download pdf
+         */
         adapter.setListenerDownload((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             FirebaseStorage storageRef =FirebaseStorage.getInstance();
@@ -118,13 +131,16 @@ public class Filters extends AppCompatActivity {
                     .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
 
             pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                HomeFragment homeFragment = new HomeFragment();
-                homeFragment.downloadPDF(partitura.getName(),".pdf", Environment.getExternalStorageDirectory().getPath(),uri.toString());
+               downloadPDF(partitura.getName(),getString(R.string.extension),
+                       Environment.getExternalStorageDirectory().getPath(),uri.toString());
             }).addOnFailureListener(exception -> {
                 // Handle any errors
             });
         });
 
+        /**
+         * When clicks on the bin delete score
+         */
         adapter.setListenerOptions((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             deletePartitura(partitura,snapshot.getId());
@@ -143,12 +159,10 @@ public class Filters extends AppCompatActivity {
         System.out.println("Creamos adaptador");
         adapter = new PartituraAdapter(options, this);
 
-        System.out.println("adaptador creado");
         adapter.notifyDataSetChanged();
 
         //asignamos el adaptador
         rvPartituras.setAdapter(adapter);
-        System.out.println("Envia adapter");
         //Podemos reaccionar ante cambios en la query.
         adapter.startListening();
         // Nosotros, lo que necesitamos es mover el scroll del recyclerView al inicio para ver el mensaje nuevo
@@ -186,7 +200,7 @@ public class Filters extends AppCompatActivity {
                         mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document(documentId).delete();
                         Intent intent = new Intent(this, PrincipalActivity.class);
                         startActivity(intent);
-                        Toast.makeText(this, "La partitura se ha borrado correctamente",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.borradoCorrecto),Toast.LENGTH_LONG).show();
                     })
                     .addOnFailureListener(exception -> Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show());
         });
@@ -195,5 +209,22 @@ public class Filters extends AppCompatActivity {
             // Qué hacemos en caso cancel
         });
         dialog.show();
+    }
+
+    /**
+     * Method to download pdf
+     * @param fileName
+     * @param fileExtension
+     * @param destinationDirectory
+     * @param url
+     */
+    public void downloadPDF(String fileName, String fileExtension, String destinationDirectory, String url) {
+        DownloadManager downloadManager = (DownloadManager) this.getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(this, destinationDirectory, fileName + fileExtension);
+        downloadManager.enqueue(request);
     }
 }

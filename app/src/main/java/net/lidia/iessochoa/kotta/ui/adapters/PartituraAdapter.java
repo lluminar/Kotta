@@ -57,6 +57,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
     @Override
     protected void onBindViewHolder(@NonNull PartituraViewHolder holder, int position, @NonNull Partitura model) {
         holder.bind(model);
+        //Only can delete the user that has uplouded the score
         FirebaseUser user  = FirebaseAuth.getInstance().getCurrentUser();
         if (model.getUser().equals(user.getEmail())) holder.ivOptions.setVisibility(View.VISIBLE);
         else holder.ivOptions.setVisibility(View.INVISIBLE);
@@ -93,6 +94,9 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
             ivOptions = itemView.findViewById(R.id.ivOptions);
             itemPartitura = itemView.findViewById(R.id.cvItem);
 
+            /**
+             * Click on item of the score
+             */
             itemPartitura.setOnClickListener(v -> {
                 int position = getAdapterPosition();
 
@@ -100,6 +104,9 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
                     listener.onItemClickElemento(getSnapshots().getSnapshot(position),position);
             });
 
+            /**
+             * Click on download icon
+             */
             ivDownload.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listenerDownload != null) {
@@ -107,6 +114,9 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
                 }
             });
 
+            /**
+             * Click on delete icon
+             */
             ivOptions.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listener != null)
@@ -115,11 +125,16 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
         }
         public Partitura getPartitura() { return partitura; }
 
+        /**
+         * Bind data
+         * @param partitura: The item of that score
+         */
         public void bind(Partitura partitura) {
             tvNameCv.setText(partitura.getName());
             tvInstrument.setText(partitura.getInstrument());
             tvAuthor.setText(partitura.getAuthor());
 
+            //Change icon and color depends of category
             switch (partitura.getCategory()) {
                 case "Videojuegos":
                     ivCategory.setImageResource(R.drawable.ic_games);

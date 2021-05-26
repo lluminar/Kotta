@@ -24,16 +24,11 @@ import net.lidia.iessochoa.kotta.ui.home.Filters;
 import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 
 /**
- * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
- * <p>You can show this modal bottom sheet from your activity like this:</p>
- * <pre>
- *     BottomSheetNavigationFragment.newInstance(30).show(getSupportFragmentManager(), "dialog");
- * </pre>
+ * A fragment that shows a list of items as a modal bottom sheet.
+ * @author Lidia Martínez Torregrosa
  */
 public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
     public final static String EXTRA_DATOS_RESULTADO = "datos";
-
-    private static final String ARG_ITEM_COUNT = "item_count";
 
     public static BottomSheetNavigationFragment newInstance() {
         final BottomSheetNavigationFragment fragment = new BottomSheetNavigationFragment();
@@ -71,7 +66,7 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
 
         NavigationView navigationView = contentView.findViewById(R.id.navigation_view);
 
-        //implement navigation menu item click event
+        //implement navigation menu item click event and open activity with query
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navRock:
@@ -121,6 +116,9 @@ public class BottomSheetNavigationFragment extends BottomSheetDialogFragment {
             return false;
         });
 
+        /**
+         * Close bottomSheet when users click close
+         */
         closeButton = contentView.findViewById(R.id.close_image_view);
         closeButton.setOnClickListener(view -> {
             //dismiss bottom sheet

@@ -24,6 +24,10 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import net.lidia.iessochoa.kotta.R;
 
+/**
+ * LoginActivity
+ * @author Lidia Martínez Torregrosa
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 1;
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         /**
-         * Sign in with editText
+         * Sign in with editText of email and password
          */
         btnSignIn.setOnClickListener(v -> {
             checkEditTextIsNotEmpty();
@@ -109,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method to signIn with email and password with firebase Aunthentication
+     */
     private void signIn() {
         if (mAuth.getCurrentUser() != null) {
             finish();// Cerramos la actividad.
@@ -127,12 +134,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                         else {
                             //If it is not authenticated, we indicate it by means of a error in editText
-                            etEmail.setError("Email or Password Not found, Please create an account");
+                            etEmail.setError(getResources().getString(R.string.notFoundCreateAccount));
                         }
                     });
         }
     }
 
+    /**
+     * Method to check if editTexts are empty
+     */
     private void checkEditTextIsNotEmpty() {
         // Getting value form Email's EditText and fill into EmailHolder string variable.
         emailHolder = etEmail.getText().toString().trim();
@@ -168,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method to signIn with a google account
+     */
     private void signInGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);

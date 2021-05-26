@@ -41,6 +41,9 @@ import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 
 import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
 
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class PrincipalActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInOptions gso;
@@ -58,6 +61,7 @@ public class PrincipalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
+        //Logout when user click
         logout = findViewById(R.id.logout);
         logout.setOnClickListener(v -> {
             logOut();
@@ -96,6 +100,9 @@ public class PrincipalActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
+    /**
+     * Method for the user logout
+     */
     private void logOut() {
         mAuth.signOut();
         mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
@@ -104,7 +111,9 @@ public class PrincipalActivity extends AppCompatActivity {
                 startActivity(mainActivity);
                 PrincipalActivity.this.finish();
             } else
-                Toast.makeText(getApplicationContext(), "Logout error",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),
+                        getResources().getString(R.string.error_logout),
+                        Toast.LENGTH_LONG).show();
         });
         Intent mainActivity = new Intent(this, MainActivity.class);
         startActivity(mainActivity);
@@ -120,6 +129,9 @@ public class PrincipalActivity extends AppCompatActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         Intent intent = new Intent(this, Filters.class);
 
+        /**
+         * Get what user want to search and open activity with query
+         */
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -130,14 +142,16 @@ public class PrincipalActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String query) {
-                //loadHistory(query);
-
                 return true;
             }
         });
         return true;
     }
 
+    /**
+     * To dropdown menu
+     * @return
+     */
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);

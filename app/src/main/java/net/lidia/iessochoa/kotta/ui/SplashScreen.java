@@ -8,6 +8,9 @@ import android.os.Handler;
 
 import net.lidia.iessochoa.kotta.R;
 
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class SplashScreen extends AppCompatActivity {
 
     @Override
@@ -15,12 +18,12 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(SplashScreen.this, MainActivity.class);
-                startActivity(intent);
-            }
+        /**
+         * Open the SplashActivity during 2500 milliseconds
+         */
+        new Handler().postDelayed(() -> {
+            Intent intent = new Intent(SplashScreen.this, MainActivity.class);
+            startActivity(intent);
         },2500);
     }
 }

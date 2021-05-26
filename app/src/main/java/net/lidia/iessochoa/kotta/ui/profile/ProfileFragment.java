@@ -1,5 +1,6 @@
 package net.lidia.iessochoa.kotta.ui.profile;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -48,7 +49,9 @@ import net.lidia.iessochoa.kotta.ui.home.HomeFragment;
 
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 import static net.lidia.iessochoa.kotta.ui.home.HomeFragment.EXTRA_PDF;
-
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class ProfileFragment extends Fragment {
 
     private AppCompatActivity activity;
@@ -84,6 +87,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //Get data of user
         tvName.setText(currentUser.getDisplayName());
         tvEmail.setText(currentUser.getEmail());
         if (currentUser.getPhotoUrl() != null)
@@ -91,6 +95,9 @@ public class ProfileFragment extends Fragment {
 
         createAdapter();
 
+        /**
+         * When clicks one item open PDFViewer
+         */
         adapter.setOnCLickElementoListener((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             Intent intent = new Intent(getActivity(), PDFReader.class);
@@ -110,6 +117,9 @@ public class ProfileFragment extends Fragment {
             });
         });
 
+        /**
+         * When clicks download image download pdf
+         */
         adapter.setListenerDownload((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             FirebaseStorage storageRef = FirebaseStorage.getInstance();
@@ -117,73 +127,93 @@ public class ProfileFragment extends Fragment {
                     .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
 
             pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                HomeFragment h = new HomeFragment();
-                h.downloadPDF(partitura.getName(), ".pdf", Environment.getExternalStorageDirectory().getPath(), uri.toString());
+                downloadPDF(partitura.getName(), getString(R.string.extension),
+                        Environment.getExternalStorageDirectory().getPath(), uri.toString());
             }).addOnFailureListener(exception -> {
                 // Handle any errors
             });
         });
 
+        /**
+         * When clicks on the bin delete score
+         */
         adapter.setListenerOptions((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             deletePartitura(partitura,snapshot.getId());
         });
-
-
     }
 
+    /**
+     * Method to delete score
+     * @param partitura: The score to delete
+     * @param documentId: position of the score
+     */
     public void deletePartitura(final Partitura partitura, final  String documentId) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle(R.string.Aviso);
         dialog.setMessage(R.string.avisoBorrar);
 
-        //En caso de que acepte borramos la partitura
         dialog.setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
-            // Qué hacemos en caso ok
+            // if ok
                 StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
                 sRef.delete()
                         .addOnSuccessListener(taskSnapshot -> {
                             mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document(documentId).delete();
                             Intent intent = new Intent(getContext(), PrincipalActivity.class);
                             startActivity(intent);
-                            Toast.makeText(getContext(), "La partitura se ha borrado correctamente",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), getString(R.string.borradoCorrecto),Toast.LENGTH_LONG).show();
                         })
                         .addOnFailureListener(exception -> Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show());
         });
-        //Si cancela no borramos el pokemon
+        //If cancel don't delete
         dialog.setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
-            // Qué hacemos en caso cancel
+
         });
         dialog.show();
     }
 
+    /**
+     * Method to download pdf
+     * @param fileName
+     * @param fileExtension
+     * @param destinationDirectory
+     * @param url
+     */
+    public void downloadPDF(String fileName, String fileExtension, String destinationDirectory, String url) {
+        DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(getContext(), destinationDirectory, fileName + fileExtension);
+        downloadManager.enqueue(request);
+    }
+
+    /**
+     * Method to create adapter on recyclerView
+     */
     private void createAdapter() {
         Query query = partituraDaoImpl.getOwnPartituras();
         FirestoreRecyclerOptions<Partitura> options = new FirestoreRecyclerOptions.Builder<Partitura>()
-                //consulta y clase en la que se guarda los datos
+                //query and class in which the data is saved
                 .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
-        //si el usuario ya habia seleccionado otra conferencia, paramos las escucha
         if (adapter != null) adapter.stopListening();
-        //Creamos el adaptador
+        //Create adapter
         adapter = new PartituraAdapter(options, getContext());
-        //asignamos el adaptador
+        //assign the adapter
         rvPartituras.setAdapter(adapter);
-        //comenzamos a escuchar. Normalmente solo tenemos un adaptador, esto tenemos que
+        //we began to listen.
         adapter.startListening();
-        // hacerlo en el evento onStar, como indica la documentación
-        //Podemos reaccionar ante cambios en la query(se añade un mensaje).
-        // Nosotros, lo que necesitamos es mover el scroll del recyclerView al inicio para ver el mensaje nuevo
+        // Move the scroll of the recyclerView to the beginning to see the new message
         adapter.getSnapshots().addChangeEventListener(new ChangeEventListener() {
             @Override
             public void onChildChanged(@NonNull ChangeEventType type, @NonNull
                     DocumentSnapshot snapshot, int newIndex, int oldIndex) {
                 rvPartituras.smoothScrollToPosition(0);
             }
-
             @Override
             public void onDataChanged() {
             }
-
             @Override
             public void onError(@NonNull FirebaseFirestoreException e) {
             }

@@ -38,6 +38,11 @@
     <string name="Videojuegos">Videojuegos</string>
     <string name="Peliculas">Películas</string>
     <string name="Baladas">Baladas</string>
+    <string name="error_logout">Logout error</string>
+    <string name="notFoundCreateAccount">Email or Password Not found, Please create an account</string>
+    <string name="subidaExito">Partitura subida con éxito</string>
+    <string name="extension">.pdf</string>
+    <string name="borradoCorrecto">La partitura se ha borrado correctamente</string>
 
     <string-array name="category">
         <item>@string/Rock</item>

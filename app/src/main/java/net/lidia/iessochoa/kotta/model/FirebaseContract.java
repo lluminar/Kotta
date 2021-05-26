@@ -1,5 +1,9 @@
 package net.lidia.iessochoa.kotta.model;
 
+/**
+ * Class with node names
+ * @author Lidia Martínez Torregrosa
+ */
 public class FirebaseContract {
     public static class PartituraEntry{
         public static final String USER="user";

@@ -55,7 +55,9 @@ import net.lidia.iessochoa.kotta.ui.profile.ProfileFragment;
 
 import static android.content.Context.SEARCH_SERVICE;
 import static net.lidia.iessochoa.kotta.ui.BottomSheetNavigationFragment.EXTRA_DATOS_RESULTADO;
-
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class HomeFragment extends Fragment {
 
     public final static String EXTRA_PDF = "partituraPdf";
@@ -96,14 +98,21 @@ public class HomeFragment extends Fragment {
             bottomSheetDialogFragment.show(activity.getSupportFragmentManager(), "Bottom Sheet Dialog Fragment");
         });
 
+        /**
+         * Open activity to add score
+         */
         fabAdd.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddActivity.class);
             startActivity(intent);
         });
 
+        //Create adapter with all scores
         query = partituraDaoImpl.AllPartituras();
         createAdapter(query);
 
+        /**
+         * When clicks one item open PDFViewer
+         */
         adapter.setOnCLickElementoListener((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             Intent intent = new Intent(getActivity(), PDFReader.class);
@@ -123,6 +132,9 @@ public class HomeFragment extends Fragment {
             });
         });
 
+        /**
+         * When clicks download image download pdf
+         */
         adapter.setListenerDownload((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             FirebaseStorage storageRef = FirebaseStorage.getInstance();
@@ -130,18 +142,27 @@ public class HomeFragment extends Fragment {
                     .child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
 
             pathReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                downloadPDF(partitura.getName(), ".pdf", Environment.getExternalStorageDirectory().getPath(), uri.toString());
+                downloadPDF(partitura.getName(), getString(R.string.extension),
+                        Environment.getExternalStorageDirectory().getPath(), uri.toString());
             }).addOnFailureListener(exception -> {
                 // Handle any errors
             });
         });
 
+        /**
+         * When clicks on the bin delete score
+         */
         adapter.setListenerOptions((snapshot, position) -> {
             Partitura partitura = snapshot.toObject(Partitura.class);
             deletePartitura(partitura,snapshot.getId());
         });
     }
 
+    /**
+     * Method to delete score
+     * @param partitura: The score to delete
+     * @param documentId: position of the score
+     */
     public void deletePartitura(final Partitura partitura, final  String documentId) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle(R.string.Aviso);
@@ -149,24 +170,29 @@ public class HomeFragment extends Fragment {
 
         //En caso de que acepte borramos la partitura
         dialog.setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
-            // Qué hacemos en caso ok
+            // if ok
             StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + partitura.getPdf());
             sRef.delete()
                     .addOnSuccessListener(taskSnapshot -> {
                         mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document(documentId).delete();
                         Intent intent = new Intent(getContext(), PrincipalActivity.class);
                         startActivity(intent);
-                        Toast.makeText(getContext(), "La partitura se ha borrado correctamente",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.borradoCorrecto),Toast.LENGTH_LONG).show();
                     })
                     .addOnFailureListener(exception -> Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show());
         });
-        //Si cancela no borramos el pokemon
         dialog.setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
-            // Qué hacemos en caso cancel
         });
         dialog.show();
     }
 
+    /**
+     * Method to download pdf
+     * @param fileName
+     * @param fileExtension
+     * @param destinationDirectory
+     * @param url
+     */
     public void downloadPDF(String fileName, String fileExtension, String destinationDirectory, String url) {
         DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
         Uri uri = Uri.parse(url);
@@ -179,23 +205,17 @@ public class HomeFragment extends Fragment {
 
     public void createAdapter(Query query) {
         FirestoreRecyclerOptions<Partitura> options = new FirestoreRecyclerOptions.Builder<Partitura>()
-                //consulta y clase en la que se guarda los datos
+                //query and class in which the data is saved
                 .setQuery(query, Partitura.class).setLifecycleOwner(this).build();
-        //si el usuario ya habia seleccionado otra conferencia, paramos las escucha
         if (adapter != null) adapter.stopListening();
-        //Creamos el adaptador
-        System.out.println("Creamos adaptador");
+        //Create adapter
         adapter = new PartituraAdapter(options, getContext());
-
-        System.out.println("adaptador creado");
         adapter.notifyDataSetChanged();
-
-        //asignamos el adaptador
+        //assign the adapter
         rvPartituras.setAdapter(adapter);
-        System.out.println("Envia adapter");
-        //Podemos reaccionar ante cambios en la query.
+        // We can react to changes in the query.
         adapter.startListening();
-        // Nosotros, lo que necesitamos es mover el scroll del recyclerView al inicio para ver el mensaje nuevo
+        // Move the scroll of the recyclerView to the beginning to see the new message
         adapter.getSnapshots().addChangeEventListener(new ChangeEventListener() {
             @Override
             public void onChildChanged(@NonNull ChangeEventType type, @NonNull

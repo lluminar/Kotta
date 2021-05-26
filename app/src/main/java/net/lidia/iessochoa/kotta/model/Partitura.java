@@ -4,6 +4,10 @@ import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
 
+/**
+ * POJO class with atributes, constructors, getters and setters
+ * @author Lidia Martínez Torregrosa
+ */
 public class Partitura {
     private String user;
     @ServerTimestamp

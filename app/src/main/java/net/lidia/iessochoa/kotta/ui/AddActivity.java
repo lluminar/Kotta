@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -38,6 +39,9 @@ import net.lidia.iessochoa.kotta.model.Partitura;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class AddActivity extends AppCompatActivity {
     private final int PICK_PDF_FILE = 2;
     private static final int MY_PERMISSIONS = 100;
@@ -67,6 +71,7 @@ public class AddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
 
+        //Initialize FirebaseApp
         mStorageReference = FirebaseStorage.getInstance().getReference();
         mDatabaseReference = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -83,13 +88,16 @@ public class AddActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         categorias = getResources().getStringArray(R.array.category);
-        //Se crean los menús para los spinners
+        //Create menu for spinner
         ArrayAdapter<String> adaptador1;
         AutoCompleteTextView actv;
         adaptador1 = new ArrayAdapter<>(this,R.layout.list_item_sp, categorias);
         actv = findViewById(R.id.fedCategoria);
         actv.setAdapter(adaptador1);
 
+        /**
+         * When user click imageView allow to get Pdf with permissions requiered
+         */
         ivPDF.setOnClickListener(v -> {
             if (noNecesarioSolicitarPermisos()) getPDF();
         });
@@ -107,7 +115,7 @@ public class AddActivity extends AppCompatActivity {
     }
 
     /**
-     * Función del menu, esto añade items a la action bar si está presente.
+     * Method of menu, this add items to action bar.
      * @param menu
      * @return
      */
@@ -118,12 +126,14 @@ public class AddActivity extends AppCompatActivity {
     }
 
     /**
-     * This method is uploading the file
-     * @param data
+     * This method is uploading the file with information
+     * @param data: To get pdf
      */
+    @SuppressLint("ResourceType")
     private void uploadFile(Uri data) {
         progressBar.setVisibility(View.VISIBLE);
-        StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS + System.currentTimeMillis() + ".pdf");
+        StorageReference sRef = mStorageReference.child(FirebaseContract.PartituraEntry.STORAGE_PATH_UPLOADS
+                + System.currentTimeMillis() + getString(R.string.extension));
         sRef.putFile(data)
                 .addOnSuccessListener(taskSnapshot -> {
                     progressBar.setVisibility(View.GONE);
@@ -137,7 +147,7 @@ public class AddActivity extends AppCompatActivity {
                     );
                     mDatabaseReference.collection(FirebaseContract.PartituraEntry.DATABASE_PATH_UPLOADS).document().set(partitura);
                     ocultarTeclado();
-                    Toast.makeText(this, "Partitura subida con éxito",Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getResources().getString(R.string.subidaExito),Toast.LENGTH_LONG).show();
 
                 })
                 .addOnFailureListener(exception -> Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show())
@@ -166,9 +176,13 @@ public class AddActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method to send an alert
+     * @param advice
+     */
     public void sendAlert(int advice) {
         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
-        dialogo.setTitle(R.string.Aviso);// titulo y mensaje
+        dialogo.setTitle(R.string.Aviso);
         dialogo.setMessage(advice);
         dialogo.setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
                 dialogInterface.dismiss());
@@ -178,8 +192,9 @@ public class AddActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //When user click save score
             case R.id.action_save:
-                //Validación de datos
+                //Data validation
                 for (EditText campo : datos) {
                     if (campo.getText().length() < 1 || actvCategoria.getText().toString().equals("")) {
                         sendAlert(R.string.vacio);
@@ -202,7 +217,7 @@ public class AddActivity extends AppCompatActivity {
     }
 
     /**
-     * Permite ocultar el teclado
+     * Method to hide the keyboard
      */
     private void ocultarTeclado() {
         InputMethodManager imm = (InputMethodManager)
@@ -212,11 +227,10 @@ public class AddActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creating an intent for file chooser
+     */
     private void getPDF() {
-        //for greater than lolipop versions we need the permissions asked on runtime
-        //so if the permission is not available user will go to the screen to allow storage permission
-
-        //creating an intent for file chooser
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -224,30 +238,30 @@ public class AddActivity extends AppCompatActivity {
     }
 
     /**
-     * Comprobamos si los permisos son necesarios
-     * @return
+     * Check if permissions are needed
+     * @return true if yes or false if not
      */
     private boolean noNecesarioSolicitarPermisos() {
-        //si la versión es inferior a la 6
+        //if the version is less than 6
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return true;
-        //comprobamos si tenemos los permisos
+        //check if we have permissions
         if (checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
             return true;
-        //indicamos al usuario porqué necesitamos los permisos siempre que no haya indicado que no lo volvamos a hacer
+        //We indicate to the user why we need the permissions as long as he has not indicated that we do not do it again
         if (shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE))  {
             Snackbar.make(clPrincipal, getString(R.string.nesitaPermisos),
                     Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, v ->
                     requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS)).show();
-        } else {//pedimos permisos sin indicar el porqué
+        } else {//we ask for permissions without indicating why
             requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE},
                     MY_PERMISSIONS);
         }
-        return false;//necesario pedir permisos
+        return false;//need to ask for permits
     }
 
     /**
-     * Si se deniegan los permisos mostramos las opciones de la aplicación para que el usuario acepte los permisos
+     * If the permissions are denied we show the application options so that the user accepts the permissions
      */
     private void muestraExplicacionDenegacionPermisos() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -277,9 +291,9 @@ public class AddActivity extends AppCompatActivity {
             if (grantResults.length == 2 && grantResults[0] ==
                     PackageManager.PERMISSION_GRANTED && grantResults[1] ==
                     PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this,"tiene permisos", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this,"tiene permisos", Toast.LENGTH_SHORT).show();
                 getPDF();
-            } else {//si no se aceptan los permisos
+            } else {//if permits are not accepted
                 muestraExplicacionDenegacionPermisos();
             }
         }
