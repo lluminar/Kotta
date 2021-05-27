@@ -1,14 +1,12 @@
 package net.lidia.iessochoa.kotta.ui.adapters;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -16,24 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import net.lidia.iessochoa.kotta.R;
-import net.lidia.iessochoa.kotta.model.FirebaseContract;
 import net.lidia.iessochoa.kotta.model.Partitura;
 
-import java.io.File;
-import java.net.MalformedURLException;
-
+/**
+ * @author Lidia Martínez Torregrosa
+ */
 public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, PartituraAdapter.PartituraViewHolder> {
 
     private final Context mContext;
@@ -80,7 +70,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
 
     public class PartituraViewHolder extends RecyclerView.ViewHolder {
         private ImageView ivCategory, ivDownload, ivOptions;
-        private TextView tvNameCv, tvInstrument, tvAuthor, tvSize;
+        private TextView tvNameCv, tvInstrument, tvAuthor;
         private Partitura partitura;
         private CardView itemPartitura;
 
@@ -130,7 +120,13 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
          * @param partitura: The item of that score
          */
         public void bind(Partitura partitura) {
-            tvNameCv.setText(partitura.getName());
+            String YourString = partitura.getName();
+            if(YourString.length()>12){
+                YourString = YourString.substring(0,11)+"...";
+                tvNameCv.setText(YourString);
+            }
+            else { tvNameCv.setText(YourString); //Don't do any change
+            }
             tvInstrument.setText(partitura.getInstrument());
             tvAuthor.setText(partitura.getAuthor());
 

@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+
 import androidx.appcompat.widget.Toolbar;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -85,6 +86,15 @@ public class PDFReader extends AppCompatActivity {
             Log.e("Connectivity Exception", e.getMessage());
         }
         return connected;
+    }
+
+    /**
+     * Go to the main activity of project
+     */
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(this, PrincipalActivity.class);
+        startActivity(intent);
     }
 
     /**
