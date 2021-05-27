@@ -121,7 +121,7 @@ public class PartituraAdapter extends FirestoreRecyclerAdapter<Partitura, Partit
          */
         public void bind(Partitura partitura) {
             String YourString = partitura.getName();
-            if(YourString.length()>12){
+            if(YourString.length()>10){
                 YourString = YourString.substring(0,11)+"...";
                 tvNameCv.setText(YourString);
             }
